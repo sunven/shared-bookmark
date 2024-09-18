@@ -1,4 +1,4 @@
-'use client'
+// 'use client'
 import React, { useState, useMemo } from 'react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -9,6 +9,7 @@ import { X, ChevronLeft, ChevronRight, ExternalLink } from 'lucide-react'
 import { Textarea } from '@/components/ui/textarea'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import Image from 'next/image'
+import { getAllSoftware } from '@/lib/db'
 
 interface Software {
   id: number
@@ -131,89 +132,94 @@ const initialSoftwareData: Software[] = [
   },
 ]
 
-const categories = ['办公软件', '媒体工具', '开发工具']
-const allTags = ['Windows', 'MacOS', 'Linux', '开源', '付费']
+// const categories = ['办公软件', '媒体工具', '开发工具']
+// const allTags = ['Windows', 'MacOS', 'Linux', '开源', '付费']
 
-export default function SoftwareManagement() {
-  const [softwareData, setSoftwareData] = useState<Software[]>(initialSoftwareData)
-  const [selectedCategories, setSelectedCategories] = useState<string[]>(categories)
-  const [selectedTags, setSelectedTags] = useState<string[]>([])
-  const [searchTerm, setSearchTerm] = useState('')
-  const [editingSoftware, setEditingSoftware] = useState<Software | null>(null)
-  const [newSoftware, setNewSoftware] = useState<Omit<Software, 'id'>>({
-    name: '',
-    category: '',
-    tags: [],
-    description: '',
-    website: '',
-    icon: '/placeholder.svg?height=64&width=64',
-  })
-  const [currentPage, setCurrentPage] = useState(1)
-  const itemsPerPage = 6
-
-  const filteredSoftware = useMemo(() => {
-    return softwareData.filter(software => {
-      const categoryMatch = selectedCategories.length === 0 || selectedCategories.includes(software.category)
-      const tagMatch = selectedTags.length === 0 || selectedTags.every(tag => software.tags.includes(tag))
-      const searchMatch = software.name.toLowerCase().includes(searchTerm.toLowerCase())
-      return categoryMatch && tagMatch && searchMatch
-    })
-  }, [softwareData, selectedCategories, selectedTags, searchTerm])
-
-  const totalPages = Math.ceil(filteredSoftware.length / itemsPerPage)
-  const paginatedSoftware = filteredSoftware.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage)
-
-  const handleAddSoftware = () => {
-    if (newSoftware.name && newSoftware.category) {
-      setSoftwareData([...softwareData, { ...newSoftware, id: Date.now() }])
-      setNewSoftware({
-        name: '',
-        category: '',
-        tags: [],
-        description: '',
-        website: '',
-        icon: '/placeholder.svg?height=64&width=64',
-      })
-    }
+export default async function SoftwareManagement() {
+  let a = await getAllSoftware()
+  if (a.length === 0) {
+    a = initialSoftwareData
   }
+  console.log('a', a)
+  // const [softwareData, setSoftwareData] = useState<Software[]>(initialSoftwareData)
+  // const [selectedCategories, setSelectedCategories] = useState<string[]>(categories)
+  // const [selectedTags, setSelectedTags] = useState<string[]>([])
+  // const [searchTerm, setSearchTerm] = useState('')
+  // const [editingSoftware, setEditingSoftware] = useState<Software | null>(null)
+  // const [newSoftware, setNewSoftware] = useState<Omit<Software, 'id'>>({
+  //   name: '',
+  //   category: '',
+  //   tags: [],
+  //   description: '',
+  //   website: '',
+  //   icon: '/placeholder.svg?height=64&width=64',
+  // })
+  // const [currentPage, setCurrentPage] = useState(1)
+  // const itemsPerPage = 6
 
-  const handleEditSoftware = () => {
-    if (editingSoftware) {
-      setSoftwareData(softwareData.map(s => (s.id === editingSoftware.id ? editingSoftware : s)))
-      setEditingSoftware(null)
-    }
-  }
+  // const filteredSoftware = useMemo(() => {
+  //   return softwareData.filter(software => {
+  //     const categoryMatch = selectedCategories.length === 0 || selectedCategories.includes(software.category)
+  //     const tagMatch = selectedTags.length === 0 || selectedTags.every(tag => software.tags.includes(tag))
+  //     const searchMatch = software.name.toLowerCase().includes(searchTerm.toLowerCase())
+  //     return categoryMatch && tagMatch && searchMatch
+  //   })
+  // }, [softwareData, selectedCategories, selectedTags, searchTerm])
 
-  const handleDeleteSoftware = (id: number) => {
-    setSoftwareData(softwareData.filter(s => s.id !== id))
-  }
+  // const totalPages = Math.ceil(filteredSoftware.length / itemsPerPage)
+  // const paginatedSoftware = filteredSoftware.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage)
 
-  const handleCategoryChange = (category: string) => {
-    setSelectedCategories(prev => {
-      if (category === '全部') {
-        return prev.length === categories.length ? [] : [...categories]
-      } else {
-        if (prev.includes(category)) {
-          return prev.filter(c => c !== category)
-        } else {
-          return [...prev, category]
-        }
-      }
-    })
-  }
+  // const handleAddSoftware = () => {
+  //   if (newSoftware.name && newSoftware.category) {
+  //     setSoftwareData([...softwareData, { ...newSoftware, id: Date.now() }])
+  //     setNewSoftware({
+  //       name: '',
+  //       category: '',
+  //       tags: [],
+  //       description: '',
+  //       website: '',
+  //       icon: '/placeholder.svg?height=64&width=64',
+  //     })
+  //   }
+  // }
 
-  const isCategorySelected = (category: string) => {
-    if (category === '全部') {
-      return selectedCategories.length === categories.length
-    }
-    return selectedCategories.includes(category)
-  }
+  // const handleEditSoftware = () => {
+  //   if (editingSoftware) {
+  //     setSoftwareData(softwareData.map(s => (s.id === editingSoftware.id ? editingSoftware : s)))
+  //     setEditingSoftware(null)
+  //   }
+  // }
+
+  // const handleDeleteSoftware = (id: number) => {
+  //   setSoftwareData(softwareData.filter(s => s.id !== id))
+  // }
+
+  // const handleCategoryChange = (category: string) => {
+  //   setSelectedCategories(prev => {
+  //     if (category === '全部') {
+  //       return prev.length === categories.length ? [] : [...categories]
+  //     } else {
+  //       if (prev.includes(category)) {
+  //         return prev.filter(c => c !== category)
+  //       } else {
+  //         return [...prev, category]
+  //       }
+  //     }
+  //   })
+  // }
+
+  // const isCategorySelected = (category: string) => {
+  //   if (category === '全部') {
+  //     return selectedCategories.length === categories.length
+  //   }
+  //   return selectedCategories.includes(category)
+  // }
 
   return (
     <div className="container mx-auto p-4">
       <h1 className="text-2xl font-bold mb-4">软件管理</h1>
 
-      <div className="mb-4 flex items-center gap-2">
+      {/* <div className="mb-4 flex items-center gap-2">
         <Label>分类</Label>
         <div className="flex flex-wrap gap-2">
           <div key="全部" className="flex items-center">
@@ -271,8 +277,8 @@ export default function SoftwareManagement() {
           value={searchTerm}
           onChange={e => setSearchTerm(e.target.value)}
         />
-      </div>
-
+      </div> */}
+      {/* 
       <Dialog>
         <DialogTrigger asChild>
           <Button className="mb-4">添加新软件</Button>
@@ -371,10 +377,10 @@ export default function SoftwareManagement() {
           </div>
           <Button onClick={handleAddSoftware}>添加软件</Button>
         </DialogContent>
-      </Dialog>
+      </Dialog> */}
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-        {paginatedSoftware.map(software => (
+        {a.map(software => (
           <div key={software.id} className="border p-4 rounded-lg relative">
             <div className="flex items-center mb-2">
               <Image src={software.icon} alt={software.name} width={64} height={64} className="mr-4" />
@@ -402,7 +408,7 @@ export default function SoftwareManagement() {
               ))}
             </div>
             <p className="mt-2 text-sm text-gray-500">{software.description}</p>
-            <div className="absolute top-2 right-2 flex gap-2">
+            {/* <div className="absolute top-2 right-2 flex gap-2">
               <Dialog>
                 <DialogTrigger asChild>
                   <Button variant="outline" size="sm">
@@ -515,12 +521,12 @@ export default function SoftwareManagement() {
               <Button variant="destructive" size="sm" onClick={() => handleDeleteSoftware(software.id)}>
                 <X className="h-4 w-4" />
               </Button>
-            </div>
+            </div> */}
           </div>
         ))}
       </div>
 
-      <div className="mt-4 flex justify-between items-center">
+      {/* <div className="mt-4 flex justify-between items-center">
         <Button onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))} disabled={currentPage === 1}>
           <ChevronLeft className="h-4 w-4 mr-2" />
           上一页
@@ -535,7 +541,7 @@ export default function SoftwareManagement() {
           下一页
           <ChevronRight className="h-4 w-4 ml-2" />
         </Button>
-      </div>
+      </div> */}
     </div>
   )
 }
