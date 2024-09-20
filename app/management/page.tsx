@@ -9,7 +9,8 @@ import { X, ChevronLeft, ChevronRight, ExternalLink } from 'lucide-react'
 import { Textarea } from '@/components/ui/textarea'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import Image from 'next/image'
-import { getAllSoftware } from '@/lib/db'
+import { getAllCategories, getAllSoftware } from '@/lib/db'
+import { revalidatePath } from 'next/cache'
 
 interface Software {
   id: number
@@ -135,14 +136,25 @@ const initialSoftwareData: Software[] = [
 // const categories = ['办公软件', '媒体工具', '开发工具']
 // const allTags = ['Windows', 'MacOS', 'Linux', '开源', '付费']
 
+async function filterSoftware(selectedCategories: number[]) {
+  // 这里实现根据选中的分类过滤软件的逻辑
+  // 例如，从数据库中获取符合条件的软件
+  const filteredSoftware = await getSoftwareByCategories(selectedCategories)
+
+  // 重新验证当前页面路径，触发重新渲染
+  revalidatePath('/management')
+
+  return filteredSoftware
+}
+
 export default async function SoftwareManagement() {
+  const categories = await getAllCategories()
   let a = await getAllSoftware()
   if (a.length === 0) {
     a = initialSoftwareData
   }
   console.log('a', a)
   // const [softwareData, setSoftwareData] = useState<Software[]>(initialSoftwareData)
-  // const [selectedCategories, setSelectedCategories] = useState<string[]>(categories)
   // const [selectedTags, setSelectedTags] = useState<string[]>([])
   // const [searchTerm, setSearchTerm] = useState('')
   // const [editingSoftware, setEditingSoftware] = useState<Software | null>(null)
@@ -194,60 +206,39 @@ export default async function SoftwareManagement() {
   //   setSoftwareData(softwareData.filter(s => s.id !== id))
   // }
 
-  // const handleCategoryChange = (category: string) => {
-  //   setSelectedCategories(prev => {
-  //     if (category === '全部') {
-  //       return prev.length === categories.length ? [] : [...categories]
-  //     } else {
-  //       if (prev.includes(category)) {
-  //         return prev.filter(c => c !== category)
-  //       } else {
-  //         return [...prev, category]
-  //       }
-  //     }
-  //   })
-  // }
-
-  // const isCategorySelected = (category: string) => {
-  //   if (category === '全部') {
-  //     return selectedCategories.length === categories.length
-  //   }
-  //   return selectedCategories.includes(category)
-  // }
-
   return (
     <div className="container mx-auto p-4">
       <h1 className="text-2xl font-bold mb-4">软件管理</h1>
 
-      {/* <div className="mb-4 flex items-center gap-2">
+      <div className="mb-4 flex items-center gap-2">
         <Label>分类</Label>
         <div className="flex flex-wrap gap-2">
           <div key="全部" className="flex items-center">
             <Checkbox
               id="category-all"
-              checked={selectedCategories.length === categories.length}
-              onCheckedChange={() => handleCategoryChange('全部')}
+              // checked={selectedCategories.length === categories.length}
+              // onCheckedChange={() => handleCategoryChange('全部')}
             />
             <label htmlFor="category-all" className="ml-2">
               全部
             </label>
           </div>
           {categories.map(category => (
-            <div key={category} className="flex items-center">
+            <div key={category.id} className="flex items-center">
               <Checkbox
                 id={`category-${category}`}
-                checked={isCategorySelected(category)}
-                onCheckedChange={() => handleCategoryChange(category)}
+                // checked={isCategorySelected(category.id)}
+                // onCheckedChange={() => handleCategoryChange(category.id)}
               />
               <label htmlFor={`category-${category}`} className="ml-2">
-                {category}
+                {category.name}
               </label>
             </div>
           ))}
         </div>
       </div>
 
-      <div className="mb-4 flex items-center gap-2">
+      {/* <div className="mb-4 flex items-center gap-2">
         <Label>标签</Label>
         <div className="flex flex-wrap gap-2">
           {allTags.map(tag => (
@@ -265,9 +256,9 @@ export default async function SoftwareManagement() {
             </div>
           ))}
         </div>
-      </div>
+      </div> */}
 
-      <div className="mb-4 flex items-center gap-2">
+      {/* <div className="mb-4 flex items-center gap-2">
         <Label htmlFor="search">搜索</Label>
         <Input
           className="flex-1"
