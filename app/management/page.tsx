@@ -3,7 +3,7 @@ import React from 'react'
 import { Label } from '@/components/ui/label'
 import { Checkbox } from '@/components/ui/checkbox'
 import { ExternalLink } from 'lucide-react'
-import { getAllCategories, getAllTags } from '@/lib/db'
+import { getAllCategories, getAllTags, getSoftwares } from '@/lib/db'
 import Link from 'next/link'
 import Form from './components/form'
 
@@ -33,17 +33,12 @@ const initialSoftwareData: Software[] = [
 // const allTags = ['Windows', 'MacOS', 'Linux', '开源', '付费']
 
 export default async function SoftwareManagement({ searchParams }) {
-  const { category } = searchParams
-  // const categoryId = searchParams.get('category')
-  // const selectedCategory = categoryId ? parseInt(categoryId, 10) : null
+  const { page = 1, pageSize = 10, category } = searchParams
   const categories = await getAllCategories()
   const tags = await getAllTags()
-  // let a = await getAllSoftware()
-  let a = []
-  if (a.length === 0) {
-    a = initialSoftwareData
-  }
-  console.log('a', a)
+  const softwares = await getSoftwares(page, pageSize, category)
+
+  console.log('a', softwares.data)
   // const [softwareData, setSoftwareData] = useState<Software[]>(initialSoftwareData)
   // const [selectedTags, setSelectedTags] = useState<string[]>([])
   // const [searchTerm, setSearchTerm] = useState('')
@@ -177,7 +172,7 @@ export default async function SoftwareManagement({ searchParams }) {
       </div> */}
       <Form categories={categories} tags={tags} />
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-        {a.map(software => (
+        {softwares.data.map(software => (
           <div key={software.id} className="border p-4 rounded-lg relative">
             <div className="flex items-center mb-2">
               {/* <Image src={software.icon} alt={software.name} width={64} height={64} className="mr-4" /> */}
@@ -193,7 +188,7 @@ export default async function SoftwareManagement({ searchParams }) {
                 </a>
               </h2>
             </div>
-            <p className="text-gray-600">分类: {software.category}</p>
+            <p className="text-gray-600">分类: {software.category.name}</p>
             <div className="mt-2">
               {software.tags.map(tag => (
                 <span

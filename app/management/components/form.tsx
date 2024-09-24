@@ -5,7 +5,7 @@ import { DialogHeader, Dialog, DialogTrigger, DialogContent, DialogTitle } from 
 import { Input } from '@/components/ui/input'
 import { Textarea } from '@/components/ui/textarea'
 import { GetResult } from '@/lib/prisma'
-import { Software } from '@prisma/client'
+import { Prisma } from '@prisma/client'
 import { Label } from '@/components/ui/label'
 import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from '@/components/ui/select'
 import React, { useEffect, useState } from 'react'
@@ -15,8 +15,16 @@ interface FormProps {
   tags: GetResult<'Tag', 'findMany'>
 }
 
+type SoftwareDto = Omit<Prisma.SoftwareUncheckedCreateInput, 'tags'> & {
+  tags: string[]
+}
+
 export default function Form({ categories, tags }: FormProps) {
-  const [software, setSoftware] = useState<Partial<Software>>({})
+  const [software, setSoftware] = useState<SoftwareDto>({
+    name: '',
+    categoryId: 0,
+    tags: [],
+  })
 
   const [isOpen, setIsOpen] = useState(false)
 
@@ -76,13 +84,13 @@ export default function Form({ categories, tags }: FormProps) {
                   <div key={tag.id} className="flex items-center">
                     <Checkbox
                       id={`tag-${tag.id}`}
-                      // checked={newSoftware.tags.includes(tag)}
-                      // onCheckedChange={checked => {
-                      //   setNewSoftware({
-                      //     ...newSoftware,
-                      //     tags: checked ? [...newSoftware.tags, tag] : newSoftware.tags.filter(t => t !== tag),
-                      //   })
-                      // }}
+                      checked={software.tags?.includes(tag.name!)}
+                      onCheckedChange={checked => {
+                        setSoftware({
+                          ...software,
+                          tags: checked ? [...software.tags, tag.name!] : software.tags?.filter(t => t !== tag.name),
+                        })
+                      }}
                     />
                     <label htmlFor={`tag-${tag.id}`} className="ml-2">
                       {tag.name}
@@ -126,7 +134,11 @@ export default function Form({ categories, tags }: FormProps) {
             </div>
           </div>
           <Button
-            onClick={() => {
+            onClick={async () => {
+              const res = await fetch('/api/management', {
+                method: 'POST',
+                body: JSON.stringify(software),
+              })
               handleClose()
             }}
           >

@@ -1,3 +1,4 @@
+import { Prisma } from '@prisma/client'
 import prisma from './prisma'
 
 export interface SoftwareInput {
@@ -12,7 +13,7 @@ export interface SoftwareInput {
 // 创建新软件
 export async function createSoftware(data: SoftwareInput) {
   const { tags, ...softwareData } = data
-  const software = await prisma.software.create({
+  return prisma.software.create({
     data: {
       ...softwareData,
       tags: {
@@ -26,39 +27,56 @@ export async function createSoftware(data: SoftwareInput) {
         })),
       },
     },
-    include: {
-      category: true,
-      tags: {
-        include: {
-          tag: true,
-        },
-      },
-    },
+    select: { id: true },
   })
-
-  return {
-    ...software,
-    tags: software.tags.map(t => t.tag.name),
-  }
 }
 
 // 获取所有软件
-export async function getAllSoftware() {
-  const softwares = await prisma.software.findMany({
-    include: {
-      category: true,
-      tags: {
-        include: {
-          tag: true,
+export async function getSoftwares(page: number, pageSize: number, categoryName?: string, tags?: string[]) {
+  const skip = (page - 1) * pageSize
+
+  const where: Prisma.SoftwareWhereInput = {}
+  if (categoryName) {
+    where.category = {
+      name: categoryName,
+    }
+  }
+  if (tags && tags.length > 0) {
+    where.tags = {
+      some: {
+        tag: {
+          name: {
+            in: tags,
+          },
         },
       },
-    },
-  })
+    }
+  }
 
-  return softwares.map(software => ({
-    ...software,
-    tags: software.tags.map(t => t.tag.name),
-  }))
+  const [softwares, total] = await Promise.all([
+    prisma.software.findMany({
+      where,
+      skip,
+      take: pageSize,
+      include: {
+        category: true,
+        tags: {
+          include: {
+            tag: true,
+          },
+        },
+      },
+    }),
+    prisma.software.count({ where }),
+  ])
+
+  return {
+    data: softwares.map(software => ({
+      ...software,
+      tags: software.tags.map(t => t.tag.name),
+    })),
+    total,
+  }
 }
 
 // 获取单个软件
