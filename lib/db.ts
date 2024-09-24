@@ -127,6 +127,7 @@ export async function deleteSoftware(id: number) {
 
 // 获取所有分类
 export async function getAllCategories() {
+  console.log('getAllCategories')
   return prisma.category.findMany()
 }
 
