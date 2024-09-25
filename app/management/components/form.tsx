@@ -121,7 +121,7 @@ export default function Form({ categories, tags }: FormProps) {
                 className="col-span-3"
               />
             </div>
-            <div className="gri d grid-cols-4 items-center gap-4">
+            <div className="grid grid-cols-4 items-center gap-4">
               <Label htmlFor="icon" className="text-right">
                 图标 URL
               </Label>
