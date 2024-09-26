@@ -9,6 +9,7 @@ import { Prisma } from '@prisma/client'
 import { Label } from '@/components/ui/label'
 import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from '@/components/ui/select'
 import React, { useEffect, useState } from 'react'
+import { useRouter } from 'next/navigation'
 
 interface FormProps {
   categories: GetResult<'Category', 'findMany'>
@@ -20,6 +21,7 @@ type SoftwareDto = Omit<Prisma.SoftwareUncheckedCreateInput, 'tags'> & {
 }
 
 export default function Form({ categories, tags }: FormProps) {
+  const router = useRouter()
   const [software, setSoftware] = useState<SoftwareDto>({
     name: '',
     categoryId: 0,
@@ -41,7 +43,7 @@ export default function Form({ categories, tags }: FormProps) {
         <DialogTrigger asChild>
           <Button className="mb-4">添加新软件</Button>
         </DialogTrigger>
-        <DialogContent>
+        <DialogContent onPointerDownOutside={e => e.preventDefault()}>
           <DialogHeader>
             <DialogTitle>添加新软件</DialogTitle>
           </DialogHeader>
@@ -135,10 +137,11 @@ export default function Form({ categories, tags }: FormProps) {
           </div>
           <Button
             onClick={async () => {
-              const res = await fetch('/api/management', {
+              await fetch('/api/management', {
                 method: 'POST',
                 body: JSON.stringify(software),
               })
+              router.refresh()
               handleClose()
             }}
           >

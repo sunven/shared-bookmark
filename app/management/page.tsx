@@ -6,28 +6,7 @@ import { ExternalLink } from 'lucide-react'
 import { getAllCategories, getAllTags, getSoftwares } from '@/lib/db'
 import Link from 'next/link'
 import Form from './components/form'
-
-interface Software {
-  id: number
-  name: string
-  category: string
-  tags: string[]
-  description: string
-  website: string
-  icon: string
-}
-
-const initialSoftwareData: Software[] = [
-  {
-    id: 1,
-    name: 'Microsoft Word',
-    category: '办公软件',
-    tags: ['Windows', '付费'],
-    description: 'Microsoft Word 是一款功能强大的文字处理软件，广泛用于创建和编辑各种文档。',
-    website: 'https://www.microsoft.com/microsoft-365/word',
-    icon: '/placeholder.svg?height=64&width=64',
-  },
-]
+import { Button } from '@/components/ui/button'
 
 // const categories = ['办公软件', '媒体工具', '开发工具']
 // const allTags = ['Windows', 'MacOS', 'Linux', '开源', '付费']
@@ -200,6 +179,9 @@ export default async function SoftwareManagement({ searchParams }) {
               ))}
             </div>
             <p className="mt-2 text-sm text-gray-500">{software.description}</p>
+            <Button variant="outline" size="sm">
+              编辑
+            </Button>
             {/* <div className="absolute top-2 right-2 flex gap-2">
               <Dialog>
                 <DialogTrigger asChild>
