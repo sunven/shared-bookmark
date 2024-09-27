@@ -10,6 +10,11 @@ import { Label } from '@/components/ui/label'
 import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from '@/components/ui/select'
 import React, { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
+import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form'
+import { z } from 'zod'
+import { useForm } from 'react-hook-form'
+import { zodResolver } from '@hookform/resolvers/zod'
+import { toast } from '@/hooks/use-toast'
 
 interface FormProps {
   categories: GetResult<'Category', 'findMany'>
@@ -20,7 +25,18 @@ type SoftwareDto = Omit<Prisma.SoftwareUncheckedCreateInput, 'tags'> & {
   tags: string[]
 }
 
-export default function Form({ categories, tags }: FormProps) {
+const FormSchema = z.object({
+  name: z.string().min(2, {
+    message: 'Username must be at least 2 characters.',
+  }),
+  categoryId: z.number(),
+  tags: z.array(z.string()),
+  description: z.string().optional(),
+  website: z.string().url().optional(),
+  icon: z.string().optional(),
+})
+
+export default function Form1({ categories, tags }: FormProps) {
   const router = useRouter()
   const [software, setSoftware] = useState<SoftwareDto>({
     name: '',
@@ -37,6 +53,28 @@ export default function Form({ categories, tags }: FormProps) {
 
   const handleOpen = () => setIsOpen(true)
   const handleClose = () => setIsOpen(false)
+  const form = useForm<z.infer<typeof FormSchema>>({
+    resolver: zodResolver(FormSchema),
+    defaultValues: {
+      name: '',
+      categoryId: 0,
+      tags: [],
+      description: '',
+      website: '',
+      icon: '',
+    },
+  })
+
+  function onSubmit(data: z.infer<typeof FormSchema>) {
+    toast({
+      title: 'You submitted the following values:',
+      description: (
+        <pre className="mt-2 w-[340px] rounded-md bg-slate-950 p-4">
+          <code className="text-white">{JSON.stringify(data, null, 2)}</code>
+        </pre>
+      ),
+    })
+  }
   return (
     <>
       <Dialog open={isOpen} onOpenChange={setIsOpen}>
@@ -47,95 +85,128 @@ export default function Form({ categories, tags }: FormProps) {
           <DialogHeader>
             <DialogTitle>添加新软件</DialogTitle>
           </DialogHeader>
-          <div className="grid gap-4 py-4">
-            <div className="grid grid-cols-4 items-center gap-4">
-              <Label htmlFor="name" className="text-right">
-                名称
-              </Label>
-              <Input
-                id="name"
-                value={software.name}
-                onChange={e => setSoftware({ ...software, name: e.target.value })}
-                className="col-span-3"
+          <Form {...form}>
+            <form onSubmit={form.handleSubmit(onSubmit)} className="w-full space-y-6">
+              <FormField
+                control={form.control}
+                name="name"
+                render={({ field }) => (
+                  <FormItem className="flex items-center gap-4">
+                    <FormLabel className="">名称</FormLabel>
+                    <FormControl className="space-y-0">
+                      <Input {...field} className="flex-1 space-y-0" />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
               />
-            </div>
-            <div className="grid grid-cols-4 items-center gap-4">
-              <Label htmlFor="category" className="text-right">
-                分类
-              </Label>
-              <Select
-                value={software.categoryId + ''}
-                onValueChange={value => setSoftware({ ...software, categoryId: +value })}
-              >
-                <SelectTrigger className="w-[180px]">
-                  <SelectValue placeholder="选择分类" />
-                </SelectTrigger>
-                <SelectContent>
-                  {categories.map(category => (
-                    <SelectItem key={category.id} value={category.id + ''}>
-                      {category.name}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-            <div className="grid grid-cols-4 items-center gap-4">
-              <Label className="text-right">标签</Label>
-              <div className="col-span-3 flex flex-wrap gap-2">
-                {tags.map(tag => (
-                  <div key={tag.id} className="flex items-center">
-                    <Checkbox
-                      id={`tag-${tag.id}`}
-                      checked={software.tags?.includes(tag.name!)}
-                      onCheckedChange={checked => {
-                        setSoftware({
-                          ...software,
-                          tags: checked ? [...software.tags, tag.name!] : software.tags?.filter(t => t !== tag.name),
-                        })
-                      }}
-                    />
-                    <label htmlFor={`tag-${tag.id}`} className="ml-2">
-                      {tag.name}
-                    </label>
-                  </div>
-                ))}
-              </div>
-            </div>
-            <div className="grid grid-cols-4 items-center gap-4">
-              <Label htmlFor="description" className="text-right">
-                描述
-              </Label>
-              <Textarea
-                id="description"
-                value={software.description ?? ''}
-                onChange={e => setSoftware({ ...software, description: e.target.value })}
-                className="col-span-3"
+              <FormField
+                control={form.control}
+                name="categoryId"
+                render={({ field }) => (
+                  <FormItem className="flex items-center gap-4">
+                    <FormLabel>分类</FormLabel>
+                    <FormControl className="flex-1">
+                      <Select onValueChange={field.onChange} defaultValue={field.value + ''}>
+                        <SelectTrigger className="w-full">
+                          <SelectValue placeholder="选择分类" />
+                        </SelectTrigger>
+                        <SelectContent className="flex-1">
+                          {categories.map(category => (
+                            <SelectItem key={category.id} value={category.id + ''}>
+                              {category.name}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
               />
-            </div>
-            <div className="grid grid-cols-4 items-center gap-4">
-              <Label htmlFor="website" className="text-right">
-                官网
-              </Label>
-              <Input
-                id="website"
-                value={software.website ?? ''}
-                onChange={e => setSoftware({ ...software, website: e.target.value })}
-                className="col-span-3"
+
+              <FormField
+                control={form.control}
+                name="tags"
+                render={() => (
+                  <FormItem className="flex items-center gap-4">
+                    <FormLabel>标签</FormLabel>
+                    <div className="flex flex-wrap gap-2">
+                      {tags.map(tag => (
+                        <FormField
+                          key={tag.id}
+                          control={form.control}
+                          name="tags"
+                          render={({ field }) => {
+                            return (
+                              <FormItem key={tag.id} className="flex flex-row items-start space-x-3 space-y-0">
+                                <FormControl>
+                                  <Checkbox
+                                    checked={field.value?.includes(tag.name!)}
+                                    onCheckedChange={checked => {
+                                      return checked
+                                        ? field.onChange([...field.value, tag.name!])
+                                        : field.onChange(field.value?.filter(value => value !== tag.name))
+                                    }}
+                                  />
+                                </FormControl>
+                                <FormLabel className="font-normal">{tag.name}</FormLabel>
+                              </FormItem>
+                            )
+                          }}
+                        />
+                      ))}
+                    </div>
+                    <FormMessage />
+                  </FormItem>
+                )}
               />
-            </div>
-            <div className="grid grid-cols-4 items-center gap-4">
-              <Label htmlFor="icon" className="text-right">
-                图标 URL
-              </Label>
-              <Input
-                id="icon"
-                value={software.icon ?? ''}
-                onChange={e => setSoftware({ ...software, icon: e.target.value })}
-                className="col-span-3"
+
+              <FormField
+                control={form.control}
+                name="website"
+                render={({ field }) => (
+                  <FormItem className="flex items-center gap-4">
+                    <FormLabel>官网</FormLabel>
+                    <FormControl>
+                      <Input {...field} className="flex-1" />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
               />
-            </div>
-          </div>
-          <Button
+
+              <FormField
+                control={form.control}
+                name="icon"
+                render={({ field }) => (
+                  <FormItem className="flex items-center gap-4">
+                    <FormLabel>图标 URL</FormLabel>
+                    <FormControl>
+                      <Input {...field} className="flex-1" />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={form.control}
+                name="description"
+                render={({ field }) => (
+                  <FormItem className="flex items-center gap-4">
+                    <FormLabel>描述</FormLabel>
+                    <FormControl>
+                      <Textarea {...field} className="flex-1" />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <Button type="submit">Submit</Button>
+            </form>
+          </Form>
+          {/* <Button
             onClick={async () => {
               await fetch('/api/management', {
                 method: 'POST',
@@ -146,7 +217,7 @@ export default function Form({ categories, tags }: FormProps) {
             }}
           >
             添加软件
-          </Button>
+          </Button> */}
         </DialogContent>
       </Dialog>
     </>
