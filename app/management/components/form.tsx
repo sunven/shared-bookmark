@@ -26,15 +26,35 @@ type SoftwareDto = Omit<Prisma.SoftwareUncheckedCreateInput, 'tags'> & {
 }
 
 const FormSchema = z.object({
-  name: z.string().min(2, {
-    message: 'Username must be at least 2 characters.',
-  }),
+  name: z.string(),
   categoryId: z.number(),
-  tags: z.array(z.string()),
+  tags: z.array(z.string()).nonempty(),
   description: z.string().optional(),
   website: z.string().url().optional(),
   icon: z.string().optional(),
 })
+
+function Mc(props: FormProps['tags']) {
+  console.log('field', props)
+  const { tags, value, onChange } = props
+  return (
+    <div className="flex  gap-4">
+      {tags.map(tag => (
+        <div key={tag.id} className="flex items-end gap-2">
+          <Checkbox
+            checked={value?.includes(tag.name!)}
+            onCheckedChange={checked => {
+              return checked
+                ? onChange([...(value || []), tag.name!])
+                : onChange(value?.filter(value => value !== tag.name))
+            }}
+          />
+          <Label>{tag.name}</Label>
+        </div>
+      ))}
+    </div>
+  )
+}
 
 export default function Form1({ categories, tags }: FormProps) {
   const router = useRouter()
@@ -56,12 +76,12 @@ export default function Form1({ categories, tags }: FormProps) {
   const form = useForm<z.infer<typeof FormSchema>>({
     resolver: zodResolver(FormSchema),
     defaultValues: {
-      name: '',
-      categoryId: 0,
-      tags: [],
-      description: '',
-      website: '',
-      icon: '',
+      // name: '',
+      // categoryId: 0,
+      // tags: [],
+      // description: '',
+      // website: '',
+      // icon: '',
     },
   })
 
@@ -91,10 +111,10 @@ export default function Form1({ categories, tags }: FormProps) {
                 control={form.control}
                 name="name"
                 render={({ field }) => (
-                  <FormItem className="flex items-center gap-4">
+                  <FormItem>
                     <FormLabel className="">名称</FormLabel>
                     <FormControl className="space-y-0">
-                      <Input {...field} className="flex-1 space-y-0" />
+                      <Input {...field} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -104,14 +124,14 @@ export default function Form1({ categories, tags }: FormProps) {
                 control={form.control}
                 name="categoryId"
                 render={({ field }) => (
-                  <FormItem className="flex items-center gap-4">
+                  <FormItem>
                     <FormLabel>分类</FormLabel>
-                    <FormControl className="flex-1">
-                      <Select onValueChange={field.onChange} defaultValue={field.value + ''}>
+                    <FormControl>
+                      <Select onValueChange={v => field.onChange(+v)} value={field.value + ''}>
                         <SelectTrigger className="w-full">
                           <SelectValue placeholder="选择分类" />
                         </SelectTrigger>
-                        <SelectContent className="flex-1">
+                        <SelectContent>
                           {categories.map(category => (
                             <SelectItem key={category.id} value={category.id + ''}>
                               {category.name}
@@ -128,35 +148,12 @@ export default function Form1({ categories, tags }: FormProps) {
               <FormField
                 control={form.control}
                 name="tags"
-                render={() => (
-                  <FormItem className="flex items-center gap-4">
+                render={({ field }) => (
+                  <FormItem>
                     <FormLabel>标签</FormLabel>
-                    <div className="flex flex-wrap gap-2">
-                      {tags.map(tag => (
-                        <FormField
-                          key={tag.id}
-                          control={form.control}
-                          name="tags"
-                          render={({ field }) => {
-                            return (
-                              <FormItem key={tag.id} className="flex flex-row items-start space-x-3 space-y-0">
-                                <FormControl>
-                                  <Checkbox
-                                    checked={field.value?.includes(tag.name!)}
-                                    onCheckedChange={checked => {
-                                      return checked
-                                        ? field.onChange([...field.value, tag.name!])
-                                        : field.onChange(field.value?.filter(value => value !== tag.name))
-                                    }}
-                                  />
-                                </FormControl>
-                                <FormLabel className="font-normal">{tag.name}</FormLabel>
-                              </FormItem>
-                            )
-                          }}
-                        />
-                      ))}
-                    </div>
+                    <FormControl>
+                      <Mc tags={tags} {...field} />
+                    </FormControl>
                     <FormMessage />
                   </FormItem>
                 )}
@@ -166,10 +163,10 @@ export default function Form1({ categories, tags }: FormProps) {
                 control={form.control}
                 name="website"
                 render={({ field }) => (
-                  <FormItem className="flex items-center gap-4">
+                  <FormItem>
                     <FormLabel>官网</FormLabel>
                     <FormControl>
-                      <Input {...field} className="flex-1" />
+                      <Input {...field} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -180,10 +177,10 @@ export default function Form1({ categories, tags }: FormProps) {
                 control={form.control}
                 name="icon"
                 render={({ field }) => (
-                  <FormItem className="flex items-center gap-4">
+                  <FormItem>
                     <FormLabel>图标 URL</FormLabel>
                     <FormControl>
-                      <Input {...field} className="flex-1" />
+                      <Input {...field} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -194,10 +191,10 @@ export default function Form1({ categories, tags }: FormProps) {
                 control={form.control}
                 name="description"
                 render={({ field }) => (
-                  <FormItem className="flex items-center gap-4">
+                  <FormItem>
                     <FormLabel>描述</FormLabel>
                     <FormControl>
-                      <Textarea {...field} className="flex-1" />
+                      <Textarea {...field} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
