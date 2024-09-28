@@ -10,11 +10,11 @@ import { Label } from '@/components/ui/label'
 import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from '@/components/ui/select'
 import React, { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
-import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form'
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form'
 import { z } from 'zod'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { toast } from '@/hooks/use-toast'
+import { useToast } from '@/hooks/use-toast'
 
 interface FormProps {
   categories: GetResult<'Category', 'findMany'>
@@ -34,14 +34,20 @@ const FormSchema = z.object({
   icon: z.string().optional(),
 })
 
-function Mc(props: FormProps['tags']) {
-  console.log('field', props)
+type MultipleCheckbox = {
+  tags: FormProps['tags']
+  value: string[]
+  onChange: (value: string[]) => void
+}
+
+function MultipleCheckbox(props: MultipleCheckbox) {
   const { tags, value, onChange } = props
   return (
     <div className="flex  gap-4">
       {tags.map(tag => (
         <div key={tag.id} className="flex items-end gap-2">
           <Checkbox
+            id={'tag-' + tag.id}
             checked={value?.includes(tag.name!)}
             onCheckedChange={checked => {
               return checked
@@ -49,7 +55,7 @@ function Mc(props: FormProps['tags']) {
                 : onChange(value?.filter(value => value !== tag.name))
             }}
           />
-          <Label>{tag.name}</Label>
+          <Label htmlFor={'tag-' + tag.id}>{tag.name}</Label>
         </div>
       ))}
     </div>
@@ -58,12 +64,7 @@ function Mc(props: FormProps['tags']) {
 
 export default function Form1({ categories, tags }: FormProps) {
   const router = useRouter()
-  const [software, setSoftware] = useState<SoftwareDto>({
-    name: '',
-    categoryId: 0,
-    tags: [],
-  })
-
+  const { toast } = useToast()
   const [isOpen, setIsOpen] = useState(false)
 
   useEffect(() => {
@@ -85,14 +86,17 @@ export default function Form1({ categories, tags }: FormProps) {
     },
   })
 
-  function onSubmit(data: z.infer<typeof FormSchema>) {
+  async function onSubmit(data: z.infer<typeof FormSchema>) {
+    console.log('data', data)
+    await fetch('/api/management', {
+      method: 'POST',
+      body: JSON.stringify(data),
+    })
+    router.refresh()
+    handleClose()
     toast({
-      title: 'You submitted the following values:',
-      description: (
-        <pre className="mt-2 w-[340px] rounded-md bg-slate-950 p-4">
-          <code className="text-white">{JSON.stringify(data, null, 2)}</code>
-        </pre>
-      ),
+      // title: 'You submitted the following values:',
+      description: '保存成功',
     })
   }
   return (
@@ -152,13 +156,12 @@ export default function Form1({ categories, tags }: FormProps) {
                   <FormItem>
                     <FormLabel>标签</FormLabel>
                     <FormControl>
-                      <Mc tags={tags} {...field} />
+                      <MultipleCheckbox tags={tags} {...field} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
                 )}
               />
-
               <FormField
                 control={form.control}
                 name="website"
@@ -172,7 +175,6 @@ export default function Form1({ categories, tags }: FormProps) {
                   </FormItem>
                 )}
               />
-
               <FormField
                 control={form.control}
                 name="icon"
@@ -203,18 +205,6 @@ export default function Form1({ categories, tags }: FormProps) {
               <Button type="submit">Submit</Button>
             </form>
           </Form>
-          {/* <Button
-            onClick={async () => {
-              await fetch('/api/management', {
-                method: 'POST',
-                body: JSON.stringify(software),
-              })
-              router.refresh()
-              handleClose()
-            }}
-          >
-            添加软件
-          </Button> */}
         </DialogContent>
       </Dialog>
     </>
