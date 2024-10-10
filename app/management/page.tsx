@@ -1,23 +1,31 @@
-// 'use client'
-import React from 'react'
+'use client'
+import React, { useEffect, useState } from 'react'
 import { Label } from '@/components/ui/label'
 import { Checkbox } from '@/components/ui/checkbox'
 import { ExternalLink } from 'lucide-react'
-import { getAllCategories, getAllTags, getSoftwares } from '@/lib/db'
-import Link from 'next/link'
 import Form from './components/form'
 import { Button } from '@/components/ui/button'
+import { Category, Software, Tag } from '@prisma/client'
+import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group'
+import useSWR from 'swr'
+import { fetcher } from '@/lib/utils'
 
-// const categories = ['办公软件', '媒体工具', '开发工具']
-// const allTags = ['Windows', 'MacOS', 'Linux', '开源', '付费']
+export default function SoftwareManagement() {
+  const [categories, setCategories] = useState<Category[]>([])
+  const [tags, setTags] = useState<Tag[]>([])
+  const [selectedCategory, setSelectedCategory] = useState<number>(0)
+  const [selectedTagIds, setSelectedTagIds] = useState<number[]>([])
+  const { data: softwares = { data: [] }, error, isLoading } = useSWR('/api/management', fetcher)
+  // const [softwares, setSoftwares] = useState<Software[]>({ data: [] })
 
-export default async function SoftwareManagement({ searchParams }) {
-  const { page = 1, pageSize = 10, category } = searchParams
-  const categories = await getAllCategories()
-  const tags = await getAllTags()
-  const softwares = await getSoftwares(page, pageSize, category)
-
-  console.log('a', softwares.data)
+  useEffect(() => {
+    fetch('/api/category')
+      .then(res => res.json())
+      .then(setCategories)
+    fetch('/api/tag')
+      .then(res => res.json())
+      .then(setTags)
+  }, [])
   // const [softwareData, setSoftwareData] = useState<Software[]>(initialSoftwareData)
   // const [selectedTags, setSelectedTags] = useState<string[]>([])
   // const [searchTerm, setSearchTerm] = useState('')
@@ -83,11 +91,25 @@ export default async function SoftwareManagement({ searchParams }) {
   return (
     <div className="container mx-auto p-4">
       <h1 className="text-2xl font-bold mb-4">软件管理</h1>
-
+      <RadioGroup
+        value={selectedCategory.toString()}
+        className="flex"
+        onValueChange={value => setSelectedCategory(Number(value))}
+      >
+        {categories.map(item => {
+          const id = 'category-' + item.id
+          return (
+            <div key={id} className="flex items-center space-x-2">
+              <RadioGroupItem value={item.id.toString()} id={id} />
+              <Label htmlFor={id}>{item.name}</Label>
+            </div>
+          )
+        })}
+      </RadioGroup>
       <div className="mb-4 flex items-center gap-2">
         <Label>分类</Label>
         <div className="flex flex-wrap gap-2">
-          <div key="全部" className="flex items-center">
+          {/* <div key="全部" className="flex items-center">
             <Checkbox
               id="category-all"
               // checked={selectedCategories.length === categories.length}
@@ -96,28 +118,28 @@ export default async function SoftwareManagement({ searchParams }) {
             <label htmlFor="category-all" className="ml-2">
               全部
             </label>
-          </div>
-          {categories.map(item => (
-            <Link
-              key={item.id}
-              href={{
-                pathname: '/management',
-                query: { ...searchParams, category: item.name },
-              }}
-            >
-              <div className="flex items-center">
-                <Checkbox id={'category-' + item.id} checked={item.name === category}>
-                  sss
-                </Checkbox>
-                <label htmlFor={'category-' + item.id} className="ml-2">
+          </div> */}
+          {tags.map(item => {
+            const id = 'tag-' + item.id
+            return (
+              <div key={id} className="flex items-center">
+                <Checkbox
+                  id={id}
+                  checked={selectedTagIds.includes(item.id)}
+                  onCheckedChange={checked => {
+                    setSelectedTagIds(
+                      checked ? [...selectedTagIds, item.id] : selectedTagIds.filter(t => t !== item.id)
+                    )
+                  }}
+                ></Checkbox>
+                <label htmlFor={id} className="ml-2">
                   {item.name}
                 </label>
               </div>
-            </Link>
-          ))}
+            )
+          })}
         </div>
       </div>
-
       {/* <div className="mb-4 flex items-center gap-2">
         <Label>标签</Label>
         <div className="flex flex-wrap gap-2">
