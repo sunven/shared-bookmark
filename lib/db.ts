@@ -1,5 +1,5 @@
-import { Prisma } from '@prisma/client'
-import prisma, { GetResult } from './prisma'
+import { Category, Prisma, Software, Tag } from '@prisma/client'
+import prisma from './prisma'
 
 export interface SoftwareInput {
   name: string
@@ -36,6 +36,12 @@ export async function createSoftware(data: SoftwareInput) {
   })
 }
 
+export type SoftwareWithRelations = Software & {
+  category: Category
+  tags: {
+    tag: Tag
+  }[]
+}
 // 获取所有软件
 export async function getSoftwares(page: number, pageSize: number, categoryId?: number | null, tagIds?: number[]) {
   const skip = (page - 1) * pageSize
@@ -74,14 +80,11 @@ export async function getSoftwares(page: number, pageSize: number, categoryId?: 
     }),
     prisma.software.count({ where }),
   ])
-  //as PaginatedResponse<GetResult<'Category', 'findMany'>>
+
   return {
-    data: softwares.map(software => ({
-      ...software,
-      tags: software.tags.map(t => t.tag.name),
-    })),
+    data: softwares,
     total,
-  }
+  } as PaginatedResponse<SoftwareWithRelations>
 }
 
 // 获取单个软件

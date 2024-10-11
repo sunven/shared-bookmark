@@ -9,13 +9,20 @@ import { Category, Software, Tag } from '@prisma/client'
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group'
 import useSWR from 'swr'
 import { fetcher } from '@/lib/utils'
+import { PaginatedResponse, SoftwareWithRelations } from '@/lib/db'
+import { GetResult } from '@/lib/prisma'
 
 export default function SoftwareManagement() {
   const [categories, setCategories] = useState<Category[]>([])
   const [tags, setTags] = useState<Tag[]>([])
   const [selectedCategory, setSelectedCategory] = useState<number>(0)
   const [selectedTagIds, setSelectedTagIds] = useState<number[]>([])
-  const { data: softwares = { data: [] }, error, isLoading } = useSWR('/api/management', fetcher)
+
+  const {
+    data: softwares = { data: [] },
+    // error,
+    // isLoading,
+  } = useSWR<PaginatedResponse<SoftwareWithRelations>>('/api/management', fetcher)
   // const [softwares, setSoftwares] = useState<Software[]>({ data: [] })
 
   useEffect(() => {
