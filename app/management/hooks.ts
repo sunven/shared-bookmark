@@ -11,6 +11,7 @@ export function useCategorys() {
   return useSWR<Category[]>('/api/category', fetcher)
 }
 
-export function useSoftwares() {
-  return useSWR<PaginatedResponse<SoftwareWithRelations>>('/api/management', fetcher)
+export function useSoftwares(data: Record<string, unknown>) {
+  const queryString = new URLSearchParams(data).toString()
+  return useSWR<PaginatedResponse<SoftwareWithRelations>>('/api/management?' + queryString, fetcher)
 }

@@ -8,7 +8,10 @@ import { Button } from '@/components/ui/button'
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group'
 import { useCategorys, useSoftwares, useTags } from './hooks'
 
+const pageSize = 6
+
 export default function SoftwareManagement() {
+  const [currentPage, setCurrentPage] = useState(1)
   const [selectedCategory, setSelectedCategory] = useState<number>(0)
   const [selectedTagIds, setSelectedTagIds] = useState<number[]>([])
   const { data: tags = [] } = useTags()
@@ -18,12 +21,11 @@ export default function SoftwareManagement() {
     mutate,
     // error,
     // isLoading,
-  } = useSoftwares()
+  } = useSoftwares({ page: currentPage, pageSize })
 
   useEffect(() => {}, [])
 
-  const [currentPage, setCurrentPage] = useState(1)
-  const totalPages = Math.ceil(total / 6)
+  const totalPages = Math.ceil(total / pageSize)
 
   // return (
   //   <div className="container mx-auto p-4">

@@ -5,4 +5,10 @@ export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs))
 }
 
-export const fetcher = (...args) => fetch(...args).then(res => res.json())
+export const fetcher = (key: string | ({ url: string } & Record<string, unknown>)) => {
+  if (typeof key === 'string') {
+    return fetch(key).then(res => res.json())
+  }
+  const { url, ...rest } = key
+  return fetch(url, rest).then(res => res.json())
+}
