@@ -4,25 +4,19 @@ import { Checkbox } from '@/components/ui/checkbox'
 import { DialogHeader, Dialog, DialogTrigger, DialogContent, DialogTitle } from '@/components/ui/dialog'
 import { Input } from '@/components/ui/input'
 import { Textarea } from '@/components/ui/textarea'
-import { GetResult } from '@/lib/prisma'
-import { Prisma } from '@prisma/client'
+import { Tag } from '@prisma/client'
 import { Label } from '@/components/ui/label'
 import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from '@/components/ui/select'
-import React, { useEffect, useState } from 'react'
-import { useRouter } from 'next/navigation'
+import React, { useState } from 'react'
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form'
 import { z } from 'zod'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useToast } from '@/hooks/use-toast'
+import { useCategorys, useTags } from '../hooks'
 
 interface FormProps {
-  categories: GetResult<'Category', 'findMany'>
-  tags: GetResult<'Tag', 'findMany'>
-}
-
-type SoftwareDto = Omit<Prisma.SoftwareUncheckedCreateInput, 'tags'> & {
-  tags: string[]
+  onFinish: () => void
 }
 
 const FormSchema = z.object({
@@ -35,7 +29,7 @@ const FormSchema = z.object({
 })
 
 type MultipleCheckbox = {
-  tags: FormProps['tags']
+  tags: Tag[]
   value: string[]
   onChange: (value: string[]) => void
 }
@@ -62,42 +56,28 @@ function MultipleCheckbox(props: MultipleCheckbox) {
   )
 }
 
-export default function Form1({ categories, tags }: FormProps) {
-  const router = useRouter()
+export default function Form1({ onFinish }: FormProps) {
+  const { data: categories = [] } = useCategorys()
+  const { data: tags = [] } = useTags()
   const { toast } = useToast()
   const [isOpen, setIsOpen] = useState(false)
-
-  useEffect(() => {
-    // 确保在客户端渲染时初始化状态
-    setIsOpen(false)
-  }, [])
-
-  const handleOpen = () => setIsOpen(true)
   const handleClose = () => setIsOpen(false)
   const form = useForm<z.infer<typeof FormSchema>>({
     resolver: zodResolver(FormSchema),
-    defaultValues: {
-      // name: '',
-      // categoryId: 0,
-      // tags: [],
-      // description: '',
-      // website: '',
-      // icon: '',
-    },
+    defaultValues: {},
   })
 
   async function onSubmit(data: z.infer<typeof FormSchema>) {
-    console.log('data', data)
     await fetch('/api/management', {
       method: 'POST',
       body: JSON.stringify(data),
     })
-    router.refresh()
-    handleClose()
     toast({
       // title: 'You submitted the following values:',
       description: '保存成功',
     })
+    onFinish()
+    handleClose()
   }
   return (
     <>
@@ -148,7 +128,6 @@ export default function Form1({ categories, tags }: FormProps) {
                   </FormItem>
                 )}
               />
-
               <FormField
                 control={form.control}
                 name="tags"
@@ -188,7 +167,6 @@ export default function Form1({ categories, tags }: FormProps) {
                   </FormItem>
                 )}
               />
-
               <FormField
                 control={form.control}
                 name="description"

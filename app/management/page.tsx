@@ -2,88 +2,28 @@
 import React, { useEffect, useState } from 'react'
 import { Label } from '@/components/ui/label'
 import { Checkbox } from '@/components/ui/checkbox'
-import { ExternalLink } from 'lucide-react'
+import { ChevronLeft, ChevronRight, ExternalLink } from 'lucide-react'
 import Form from './components/form'
 import { Button } from '@/components/ui/button'
-import { Category, Software, Tag } from '@prisma/client'
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group'
-import useSWR from 'swr'
-import { fetcher } from '@/lib/utils'
-import { PaginatedResponse, SoftwareWithRelations } from '@/lib/db'
-import { GetResult } from '@/lib/prisma'
+import { useCategorys, useSoftwares, useTags } from './hooks'
 
 export default function SoftwareManagement() {
-  const [categories, setCategories] = useState<Category[]>([])
-  const [tags, setTags] = useState<Tag[]>([])
   const [selectedCategory, setSelectedCategory] = useState<number>(0)
   const [selectedTagIds, setSelectedTagIds] = useState<number[]>([])
-
+  const { data: tags = [] } = useTags()
+  const { data: categories = [] } = useCategorys()
   const {
-    data: softwares = { data: [] },
+    data: { data = [], total = 0 } = {},
+    mutate,
     // error,
     // isLoading,
-  } = useSWR<PaginatedResponse<SoftwareWithRelations>>('/api/management', fetcher)
-  // const [softwares, setSoftwares] = useState<Software[]>({ data: [] })
+  } = useSoftwares()
 
-  useEffect(() => {
-    fetch('/api/category')
-      .then(res => res.json())
-      .then(setCategories)
-    fetch('/api/tag')
-      .then(res => res.json())
-      .then(setTags)
-  }, [])
-  // const [softwareData, setSoftwareData] = useState<Software[]>(initialSoftwareData)
-  // const [selectedTags, setSelectedTags] = useState<string[]>([])
-  // const [searchTerm, setSearchTerm] = useState('')
-  // const [editingSoftware, setEditingSoftware] = useState<Software | null>(null)
-  // const [newSoftware, setNewSoftware] = useState<Omit<Software, 'id'>>({
-  //   name: '',
-  //   category: '',
-  //   tags: [],
-  //   description: '',
-  //   website: '',
-  //   icon: '/placeholder.svg?height=64&width=64',
-  // })
-  // const [currentPage, setCurrentPage] = useState(1)
-  // const itemsPerPage = 6
+  useEffect(() => {}, [])
 
-  // const filteredSoftware = useMemo(() => {
-  //   return softwareData.filter(software => {
-  //     const categoryMatch = selectedCategories.length === 0 || selectedCategories.includes(software.category)
-  //     const tagMatch = selectedTags.length === 0 || selectedTags.every(tag => software.tags.includes(tag))
-  //     const searchMatch = software.name.toLowerCase().includes(searchTerm.toLowerCase())
-  //     return categoryMatch && tagMatch && searchMatch
-  //   })
-  // }, [softwareData, selectedCategories, selectedTags, searchTerm])
-
-  // const totalPages = Math.ceil(filteredSoftware.length / itemsPerPage)
-  // const paginatedSoftware = filteredSoftware.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage)
-
-  // const handleAddSoftware = () => {
-  //   if (newSoftware.name && newSoftware.category) {
-  //     setSoftwareData([...softwareData, { ...newSoftware, id: Date.now() }])
-  //     setNewSoftware({
-  //       name: '',
-  //       category: '',
-  //       tags: [],
-  //       description: '',
-  //       website: '',
-  //       icon: '/placeholder.svg?height=64&width=64',
-  //     })
-  //   }
-  // }
-
-  // const handleEditSoftware = () => {
-  //   if (editingSoftware) {
-  //     setSoftwareData(softwareData.map(s => (s.id === editingSoftware.id ? editingSoftware : s)))
-  //     setEditingSoftware(null)
-  //   }
-  // }
-
-  // const handleDeleteSoftware = (id: number) => {
-  //   setSoftwareData(softwareData.filter(s => s.id !== id))
-  // }
+  const [currentPage, setCurrentPage] = useState(1)
+  const totalPages = Math.ceil(total / 6)
 
   // return (
   //   <div className="container mx-auto p-4">
@@ -148,26 +88,6 @@ export default function SoftwareManagement() {
         </div>
       </div>
       {/* <div className="mb-4 flex items-center gap-2">
-        <Label>标签</Label>
-        <div className="flex flex-wrap gap-2">
-          {allTags.map(tag => (
-            <div key={tag} className="flex items-center">
-              <Checkbox
-                id={tag}
-                checked={selectedTags.includes(tag)}
-                onCheckedChange={checked => {
-                  setSelectedTags(checked ? [...selectedTags, tag] : selectedTags.filter(t => t !== tag))
-                }}
-              />
-              <label htmlFor={tag} className="ml-2">
-                {tag}
-              </label>
-            </div>
-          ))}
-        </div>
-      </div> */}
-
-      {/* <div className="mb-4 flex items-center gap-2">
         <Label htmlFor="search">搜索</Label>
         <Input
           className="flex-1"
@@ -178,15 +98,15 @@ export default function SoftwareManagement() {
           onChange={e => setSearchTerm(e.target.value)}
         />
       </div> */}
-      <Form categories={categories} tags={tags} />
+      <Form onFinish={mutate} />
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-        {softwares.data.map(software => (
+        {data.map(software => (
           <div key={software.id} className="border p-4 rounded-lg relative">
             <div className="flex items-center mb-2">
               {/* <Image src={software.icon} alt={software.name} width={64} height={64} className="mr-4" /> */}
               <h2 className="text-xl font-semibold">
                 <a
-                  href={software.website}
+                  href={software.website!}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="hover:underline flex items-center"
@@ -198,12 +118,12 @@ export default function SoftwareManagement() {
             </div>
             <p className="text-gray-600">分类: {software.category.name}</p>
             <div className="mt-2">
-              {software.tags.map(tag => (
+              {software.tags.map(c => (
                 <span
-                  key={tag}
+                  key={c.tag.id}
                   className="inline-block bg-gray-200 rounded-full px-3 py-1 text-sm font-semibold text-gray-700 mr-2 mb-2"
                 >
-                  {tag}
+                  {c.tag.name}
                 </span>
               ))}
             </div>
@@ -211,125 +131,10 @@ export default function SoftwareManagement() {
             <Button variant="outline" size="sm">
               编辑
             </Button>
-            {/* <div className="absolute top-2 right-2 flex gap-2">
-              <Dialog>
-                <DialogTrigger asChild>
-                  <Button variant="outline" size="sm">
-                    编辑
-                  </Button>
-                </DialogTrigger>
-                <DialogContent>
-                  <DialogHeader>
-                    <DialogTitle>编辑软件</DialogTitle>
-                  </DialogHeader>
-                  <div className="grid gap-4 py-4">
-                    <div className="grid grid-cols-4 items-center gap-4">
-                      <Label htmlFor="edit-name" className="text-right">
-                        名称
-                      </Label>
-                      <Input
-                        id="edit-name"
-                        value={editingSoftware?.name || ''}
-                        onChange={e => setEditingSoftware(prev => (prev ? { ...prev, name: e.target.value } : null))}
-                        className="col-span-3"
-                      />
-                    </div>
-                    <div className="grid grid-cols-4 items-center gap-4">
-                      <Label htmlFor="edit-category" className="text-right">
-                        分类
-                      </Label>
-                      <Select
-                        value={editingSoftware?.category || ''}
-                        onValueChange={value =>
-                          setEditingSoftware(prev => (prev ? { ...prev, category: value } : null))
-                        }
-                      >
-                        <SelectTrigger className="w-[180px]">
-                          <SelectValue placeholder="选择分类" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          {categories.map(category => (
-                            <SelectItem key={category} value={category}>
-                              {category}
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                    </div>
-                    <div className="grid grid-cols-4 items-center gap-4">
-                      <Label className="text-right">标签</Label>
-                      <div className="col-span-3 flex flex-wrap gap-2">
-                        {allTags.map(tag => (
-                          <div key={tag} className="flex items-center">
-                            <Checkbox
-                              id={`edit-${tag}`}
-                              checked={editingSoftware?.tags.includes(tag)}
-                              onCheckedChange={checked => {
-                                setEditingSoftware(prev =>
-                                  prev
-                                    ? {
-                                        ...prev,
-                                        tags: checked ? [...prev.tags, tag] : prev.tags.filter(t => t !== tag),
-                                      }
-                                    : null
-                                )
-                              }}
-                            />
-                            <label htmlFor={`edit-${tag}`} className="ml-2">
-                              {tag}
-                            </label>
-                          </div>
-                        ))}
-                      </div>
-                    </div>
-                    <div className="grid grid-cols-4 items-center gap-4">
-                      <Label htmlFor="edit-description" className="text-right">
-                        描述
-                      </Label>
-                      <Textarea
-                        id="edit-description"
-                        value={editingSoftware?.description || ''}
-                        onChange={e =>
-                          setEditingSoftware(prev => (prev ? { ...prev, description: e.target.value } : null))
-                        }
-                        className="col-span-3"
-                      />
-                    </div>
-                    <div className="grid grid-cols-4 items-center gap-4">
-                      <Label htmlFor="edit-website" className="text-right">
-                        官网
-                      </Label>
-                      <Input
-                        id="edit-website"
-                        value={editingSoftware?.website || ''}
-                        onChange={e => setEditingSoftware(prev => (prev ? { ...prev, website: e.target.value } : null))}
-                        className="col-span-3"
-                      />
-                    </div>
-                    <div className="grid grid-cols-4 items-center gap-4">
-                      <Label htmlFor="edit-icon" className="text-right">
-                        图标 URL
-                      </Label>
-                      <Input
-                        id="edit-icon"
-                        value={editingSoftware?.icon || ''}
-                        onChange={e => setEditingSoftware(prev => (prev ? { ...prev, icon: e.target.value } : null))}
-                        className="col-span-3"
-                      />
-                    </div>
-                  </div>
-                  <Button onClick={handleEditSoftware}>保存修改</Button>
-                </DialogContent>
-              </Dialog>
-              <Button variant="destructive" size="sm" onClick={() => handleDeleteSoftware(software.id)}>
-                <X className="h-4 w-4" />
-              </Button>
-            </div> */}
           </div>
         ))}
       </div>
-
-      {/* <div className="mt-4 flex justify-between items-center">
+      <div className="mt-4 flex justify-between items-center">
         <Button onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))} disabled={currentPage === 1}>
           <ChevronLeft className="h-4 w-4 mr-2" />
           上一页
@@ -344,7 +149,7 @@ export default function SoftwareManagement() {
           下一页
           <ChevronRight className="h-4 w-4 ml-2" />
         </Button>
-      </div> */}
+      </div>
     </div>
   )
 }
