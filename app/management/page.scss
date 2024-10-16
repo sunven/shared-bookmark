@@ -1,0 +1,7 @@
+.card {
+  &:hover {
+    .operation {
+      display: block;
+    }
+  }
+}

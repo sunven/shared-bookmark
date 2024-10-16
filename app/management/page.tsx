@@ -2,18 +2,35 @@
 import React, { useEffect, useState } from 'react'
 import { Label } from '@/components/ui/label'
 import { Checkbox } from '@/components/ui/checkbox'
-import { ChevronLeft, ChevronRight, ExternalLink } from 'lucide-react'
+import { ChevronLeft, ChevronRight, ExternalLink, Pencil, Trash2 } from 'lucide-react'
 import Form from './components/form'
 import { Button } from '@/components/ui/button'
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group'
 import { useCategorys, useSoftwares, useTags } from './hooks'
+import './page.scss'
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from '@/components/ui/alert-dialog'
+import { useHttp } from '@/hooks/use-http'
+import { useToast } from '@/hooks/use-toast'
 
 const pageSize = 6
 
 export default function SoftwareManagement() {
+  const { toast } = useToast()
+  const http = useHttp()
   const [currentPage, setCurrentPage] = useState(1)
   const [selectedCategory, setSelectedCategory] = useState<number>(0)
   const [selectedTagIds, setSelectedTagIds] = useState<number[]>([])
+  const [isAlertOpen, setIsAlertOpen] = useState(false)
   const { data: tags = [] } = useTags()
   const { data: categories = [] } = useCategorys()
   const {
@@ -36,6 +53,13 @@ export default function SoftwareManagement() {
   //     <Suspense fallback={<div>加载软件列表...</div>}>{/* <SoftwareList initialSoftware={software} /> */}</Suspense>
   //   </div>
   // )
+
+  const handleDelete = (id: number) => {
+    http.delete('/api/management', { id }).then(res => {
+      console.log('res', res)
+      mutate()
+    })
+  }
 
   return (
     <div className="container mx-auto p-4">
@@ -101,9 +125,33 @@ export default function SoftwareManagement() {
         />
       </div> */}
       <Form onFinish={mutate} />
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
         {data.map(software => (
-          <div key={software.id} className="border p-4 rounded-lg relative">
+          <div key={software.id} className="card border p-4 rounded-lg relative">
+            <div className="absolute top-2 right-2 hidden operation">
+              <Button variant="ghost" size="icon" className="h-8 w-8 text-blue-500 hover:text-blue-700">
+                <Pencil className="h-5 w-5" />
+              </Button>
+              <AlertDialog open={isAlertOpen} onOpenChange={setIsAlertOpen}>
+                <AlertDialogTrigger asChild>
+                  <Button variant="ghost" size="icon" className="h-8 w-8 text-red-500 hover:text-red-700">
+                    <Trash2 className="h-5 w-5" />
+                  </Button>
+                </AlertDialogTrigger>
+                <AlertDialogContent>
+                  <AlertDialogHeader>
+                    <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
+                    <AlertDialogDescription>
+                      This action cannot be undone. This will permanently delete your data from our servers.
+                    </AlertDialogDescription>
+                  </AlertDialogHeader>
+                  <AlertDialogFooter>
+                    <AlertDialogCancel>Cancel</AlertDialogCancel>
+                    <AlertDialogAction onClick={() => handleDelete(software.id)}>Continue</AlertDialogAction>
+                  </AlertDialogFooter>
+                </AlertDialogContent>
+              </AlertDialog>
+            </div>
             <div className="flex items-center mb-2">
               {/* <Image src={software.icon} alt={software.name} width={64} height={64} className="mr-4" /> */}
               <h2 className="text-xl font-semibold">
@@ -130,7 +178,16 @@ export default function SoftwareManagement() {
               ))}
             </div>
             <p className="mt-2 text-sm text-gray-500">{software.description}</p>
-            <Button variant="outline" size="sm">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => {
+                toast({
+                  title: 'You submitted the following values:',
+                  description: '保存成功',
+                })
+              }}
+            >
               编辑
             </Button>
           </div>
