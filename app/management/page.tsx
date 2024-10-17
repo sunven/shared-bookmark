@@ -19,14 +19,13 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from '@/components/ui/alert-dialog'
-import { useHttp } from '@/hooks/use-http'
-import { useToast } from '@/hooks/use-toast'
+import { http } from '@/lib/http'
+// import { useHttp } from '@/hooks/use-http'
 
 const pageSize = 6
 
 export default function SoftwareManagement() {
-  const { toast } = useToast()
-  const http = useHttp()
+  // const { toast } = useToast()
   const [currentPage, setCurrentPage] = useState(1)
   const [selectedCategory, setSelectedCategory] = useState<number>(0)
   const [selectedTagIds, setSelectedTagIds] = useState<number[]>([])
@@ -182,10 +181,10 @@ export default function SoftwareManagement() {
               variant="outline"
               size="sm"
               onClick={() => {
-                toast({
-                  title: 'You submitted the following values:',
-                  description: '保存成功',
-                })
+                // toast({
+                //   title: 'You submitted the following values:',
+                //   description: '保存成功',
+                // })
               }}
             >
               编辑

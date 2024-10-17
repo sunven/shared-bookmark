@@ -1,3 +1,4 @@
+import { toast } from '@/hooks/use-toast'
 import { clsx, type ClassValue } from 'clsx'
 import { twMerge } from 'tailwind-merge'
 
@@ -11,4 +12,12 @@ export const fetcher = (key: string | ({ url: string } & Record<string, unknown>
   }
   const { url, ...rest } = key
   return fetch(url, rest).then(res => res.json())
+}
+
+export function toastError(msg: string) {
+  toast({
+    variant: 'destructive',
+    title: 'error',
+    description: msg,
+  })
 }
