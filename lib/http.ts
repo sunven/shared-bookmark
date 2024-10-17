@@ -31,13 +31,12 @@ class HttpClient {
     this.config = { ...defaultConfig, ...config }
   }
 
-  private async request<T>(
+  async request<T>(
     method: HttpMethod,
     url: string,
     data: unknown = null,
     customConfig: Partial<RequestConfig> = {}
   ): Promise<T> {
-    console.log('request')
     const fullUrl = this.config.baseURL + url
     const config: RequestConfig = {
       ...this.config,
@@ -47,15 +46,12 @@ class HttpClient {
     }
 
     if (data) {
-      debugger
       if (method === 'GET' || method === 'DELETE') {
-        console.log('abc', url, config)
         url += '?' + new URLSearchParams(data as Record<string, string>).toString()
       } else {
         config.body = JSON.stringify(data)
       }
     }
-    console.log('abc1', url, config)
 
     const controller = new AbortController()
     const timeoutId = setTimeout(() => controller.abort(), config.timeout)
@@ -87,63 +83,66 @@ class HttpClient {
       throw error
     }
   }
+}
 
-  // get<T>(url: string, params?: Record<string, string | number>, config?: Partial<RequestConfig>): Promise<T> {
-  //   return this.request<T>(url, 'GET', params, config)
-  // }
-
-  get<T>(url: string, params?: Record<string, string | number>, config?: Partial<RequestConfig>): Promise<T>
-  get<T>(args: [string, Record<string, string | number>?, Partial<RequestConfig>?]): Promise<T>
-  get<T>(
-    urlOrArgs: string | [string, Record<string, string | number>?, Partial<RequestConfig>?],
-    params?: Record<string, string | number>,
-    config?: Partial<RequestConfig>
-  ): Promise<T> {
-    console.log('urlOrArgs', urlOrArgs)
-    if (Array.isArray(urlOrArgs)) {
-      return this.request<T>('GET', ...urlOrArgs)
-    }
-    return this.request<T>('GET', urlOrArgs, params, config)
+export function get<T>(
+  url: string,
+  params?: Record<string, string | number>,
+  config?: Partial<RequestConfig>
+): Promise<T>
+export function get<T>(args: [string, Record<string, string | number>?, Partial<RequestConfig>?]): Promise<T>
+export function get<T>(
+  urlOrArgs: string | [string, Record<string, string | number>?, Partial<RequestConfig>?],
+  params?: Record<string, string | number>,
+  config?: Partial<RequestConfig>
+): Promise<T> {
+  if (Array.isArray(urlOrArgs)) {
+    return http.request<T>('GET', ...urlOrArgs)
   }
+  return http.request<T>('GET', urlOrArgs, params, config)
+}
 
-  post<T>(url: string, data?: unknown, config?: Partial<RequestConfig>): Promise<T>
-  post<T>(args: [string, unknown?, Partial<RequestConfig>?]): Promise<T>
-  post<T>(
-    urlOrArgs: string | [string, unknown?, Partial<RequestConfig>?],
-    data?: unknown,
-    config?: Partial<RequestConfig>
-  ): Promise<T> {
-    if (Array.isArray(urlOrArgs)) {
-      return this.request<T>('POST', ...urlOrArgs)
-    }
-    return this.request<T>('POST', urlOrArgs, data, config)
+export function post<T>(url: string, data?: unknown, config?: Partial<RequestConfig>): Promise<T>
+export function post<T>(args: [string, unknown?, Partial<RequestConfig>?]): Promise<T>
+export function post<T>(
+  urlOrArgs: string | [string, unknown?, Partial<RequestConfig>?],
+  data?: unknown,
+  config?: Partial<RequestConfig>
+): Promise<T> {
+  if (Array.isArray(urlOrArgs)) {
+    return http.request<T>('POST', ...urlOrArgs)
   }
+  return http.request<T>('POST', urlOrArgs, data, config)
+}
 
-  put<T>(url: string, data?: unknown, config?: Partial<RequestConfig>): Promise<T>
-  put<T>(args: [string, unknown?, Partial<RequestConfig>?]): Promise<T>
-  put<T>(
-    urlOrArgs: string | [string, unknown?, Partial<RequestConfig>?],
-    data?: unknown,
-    config?: Partial<RequestConfig>
-  ): Promise<T> {
-    if (Array.isArray(urlOrArgs)) {
-      return this.request<T>('PUT', ...urlOrArgs)
-    }
-    return this.request<T>('PUT', urlOrArgs, data, config)
+export function put<T>(url: string, data?: unknown, config?: Partial<RequestConfig>): Promise<T>
+export function put<T>(args: [string, unknown?, Partial<RequestConfig>?]): Promise<T>
+export function put<T>(
+  urlOrArgs: string | [string, unknown?, Partial<RequestConfig>?],
+  data?: unknown,
+  config?: Partial<RequestConfig>
+): Promise<T> {
+  if (Array.isArray(urlOrArgs)) {
+    return http.request<T>('PUT', ...urlOrArgs)
   }
+  return http.request<T>('PUT', urlOrArgs, data, config)
+}
 
-  delete<T>(url: string, params?: Record<string, string | number>, config?: Partial<RequestConfig>): Promise<T>
-  delete<T>(args: [string, Record<string, string | number>?, Partial<RequestConfig>?]): Promise<T>
-  delete<T>(
-    urlOrArgs: string | [string, Record<string, string | number>?, Partial<RequestConfig>?],
-    params?: Record<string, string | number>,
-    config?: Partial<RequestConfig>
-  ): Promise<T> {
-    if (Array.isArray(urlOrArgs)) {
-      return this.request<T>('DELETE', ...urlOrArgs)
-    }
-    return this.request<T>('DELETE', urlOrArgs, params, config)
+export function del<T>(
+  url: string,
+  params?: Record<string, string | number>,
+  config?: Partial<RequestConfig>
+): Promise<T>
+export function del<T>(args: [string, Record<string, string | number>?, Partial<RequestConfig>?]): Promise<T>
+export function del<T>(
+  urlOrArgs: string | [string, Record<string, string | number>?, Partial<RequestConfig>?],
+  params?: Record<string, string | number>,
+  config?: Partial<RequestConfig>
+): Promise<T> {
+  if (Array.isArray(urlOrArgs)) {
+    return http.request<T>('DELETE', ...urlOrArgs)
   }
+  return http.request<T>('DELETE', urlOrArgs, params, config)
 }
 
 // 创建实例
