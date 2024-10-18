@@ -7,7 +7,7 @@
     "build": "prisma generate && next build",
     "start": "next start",
     "lint": "next lint",
-    "prisma:format": "prisma migrate",
+    "prisma:format": "prisma format",
     "prisma:pull": "dotenv -e .env.local prisma db pull",
     "prisma:migrate": "dotenv -e .env.local prisma migrate dev",
     "prisma:generate": "prisma generate"

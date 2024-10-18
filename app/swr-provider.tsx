@@ -5,6 +5,9 @@ export const SWRProvider = ({ children }) => {
   return (
     <SWRConfig
       value={{
+        revalidateIfStale: false,
+        revalidateOnFocus: false,
+        revalidateOnReconnect: false,
         onError: (error, key) => {
           if (error.status !== 403 && error.status !== 404) {
             toast({

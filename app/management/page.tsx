@@ -19,7 +19,7 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from '@/components/ui/alert-dialog'
-import { del } from '@/lib/http'
+import { http } from '@/lib/http'
 // import { useHttp } from '@/hooks/use-http'
 
 const pageSize = 6
@@ -54,7 +54,7 @@ export default function SoftwareManagement() {
   // )
 
   const handleDelete = (id: number) => {
-    del('/api/management', { id }).then(res => {
+    http.delete('/api/management', { id }).then(res => {
       console.log('res', res)
       mutate()
     })

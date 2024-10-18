@@ -34,9 +34,10 @@ model Tag {
 }
 
 model SoftwareTag {
-  software   Software @relation(fields: [softwareId], references: [id])
+  software   Software @relation(fields: [softwareId], references: [id], onDelete: Cascade)
   softwareId Int
   tag        Tag      @relation(fields: [tagId], references: [id])
   tagId      Int
+
   @@id([softwareId, tagId])
 }

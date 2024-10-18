@@ -146,7 +146,7 @@ export async function updateSoftware(id: number, data: SoftwareInput) {
 
 // 删除软件
 export async function deleteSoftware(id: number) {
-  await prisma.software.delete({
+  return prisma.software.delete({
     where: { id },
   })
 }
