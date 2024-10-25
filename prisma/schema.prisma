@@ -41,3 +41,23 @@ model SoftwareTag {
 
   @@id([softwareId, tagId])
 }
+
+model Topic {
+  id        String   @id @default(cuid())
+  name      String   @db.VarChar(128)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  urls      Url[]
+}
+
+model Url {
+  id          Int      @id @default(autoincrement())
+  icon        String?  @db.VarChar(128)
+  url         String   @db.VarChar(128)
+  title       String   @db.VarChar(128)
+  description String?  @db.VarChar(512)
+  topic       Topic    @relation(fields: [topicId], references: [id])
+  topicId     String
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
