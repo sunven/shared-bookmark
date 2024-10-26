@@ -161,7 +161,15 @@ export async function getAllTags() {
   return prisma.tag.findMany()
 }
 
-export async function createTopic(data: Prisma.TopicCreateInput) {
+export async function createTopic(data: {
+  name: string
+  urls: {
+    icon?: string
+    title: string
+    url: string
+    description?: string
+  }[]
+}) {
   return prisma.topic.create({
     data: {
       name: data.name,
