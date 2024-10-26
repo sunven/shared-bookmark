@@ -160,3 +160,15 @@ export async function getAllCategories() {
 export async function getAllTags() {
   return prisma.tag.findMany()
 }
+
+export async function createTopic(data: Prisma.TopicCreateInput) {
+  return prisma.topic.create({
+    data: {
+      name: data.name,
+      urls: {
+        create: data.urls,
+      },
+    },
+    select: { id: true },
+  })
+}
