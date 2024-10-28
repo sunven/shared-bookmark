@@ -5,8 +5,10 @@ import { createTopic as createTopic1 } from '../../lib/db'
 import { formSchema } from './schema'
 
 export async function createTopic(values: z.infer<typeof formSchema>) {
+  console.log('values', values)
   try {
     const validatedData = formSchema.parse(values)
+    console.log('validatedData', validatedData)
     return await createTopic1(validatedData)
   } catch (error) {
     if (error instanceof z.ZodError) {

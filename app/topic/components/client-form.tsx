@@ -14,7 +14,14 @@ import { http } from '@/lib/http'
 export default function ClientForm() {
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
-    defaultValues: { urls: [{ icon: '', title: '', url: '' }] },
+    defaultValues: {
+      urls: [
+        {
+          title: '',
+          url: '',
+        },
+      ],
+    },
   })
 
   const { fields, append, remove } = useFieldArray({
@@ -34,13 +41,13 @@ export default function ClientForm() {
     <Form {...form}>
       <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-8 mx-[25%]">
         <FormField
-          name="title"
+          name="name"
           render={({ field }) => (
             <FormItem>
               <div className="flex items-center space-x-4">
                 <FormLabel className="flex-shrink-0 w-20">标题</FormLabel>
                 <FormControl>
-                  <Input placeholder="输入标题" {...field} />
+                  <Input {...field} />
                 </FormControl>
               </div>
               <FormMessage />
@@ -64,20 +71,6 @@ export default function ClientForm() {
               </div>
             )}
             <FormField
-              name={`urls.${index}.title`}
-              render={({ field }) => (
-                <FormItem>
-                  <div className="flex items-center space-x-4">
-                    <FormLabel className="flex-shrink-0 w-20">网址标题</FormLabel>
-                    <FormControl>
-                      <Input placeholder="网址标题" {...field} />
-                    </FormControl>
-                  </div>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <FormField
               name={`urls.${index}.url`}
               render={({ field }) => (
                 <FormItem>
@@ -85,7 +78,7 @@ export default function ClientForm() {
                     <FormLabel className="flex-shrink-0 w-20">网址</FormLabel>
                     <FormControl>
                       <div className="flex flex-1 gap-2">
-                        <Input className="flex-1" placeholder="https://example.com" {...field} />{' '}
+                        <Input className="flex-1" {...field} />
                         <Button
                           type="button"
                           onClick={async () => {
@@ -108,6 +101,20 @@ export default function ClientForm() {
                           解析网址
                         </Button>
                       </div>
+                    </FormControl>
+                  </div>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              name={`urls.${index}.title`}
+              render={({ field }) => (
+                <FormItem>
+                  <div className="flex items-center space-x-4">
+                    <FormLabel className="flex-shrink-0 w-20">网址标题</FormLabel>
+                    <FormControl>
+                      <Input {...field} />
                     </FormControl>
                   </div>
                   <FormMessage />
@@ -144,11 +151,13 @@ export default function ClientForm() {
             />
           </div>
         ))}
-        <Button type="button" variant="outline" onClick={() => append({ title: '', url: '' })}>
-          <PlusCircle className="h-4 w-4 mr-2" />
-          添加网址
-        </Button>
-        <Button type="submit">提交</Button>
+        <div className="flex justify-between">
+          <Button type="button" variant="outline" onClick={() => append({ title: '', url: '' })}>
+            <PlusCircle className="h-4 w-4 mr-2" />
+            添加网址
+          </Button>
+          <Button type="submit">提交</Button>
+        </div>
       </form>
     </Form>
   )
