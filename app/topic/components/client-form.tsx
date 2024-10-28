@@ -2,15 +2,16 @@
 import { z } from 'zod'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
-import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form'
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form'
 import { useFieldArray, useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { toast } from '@/hooks/use-toast'
-import { PlusCircle, X } from 'lucide-react'
+import { PlusCircle, Trash2 } from 'lucide-react'
 import { formSchema } from '../schema'
+import { createTopic } from '../actions'
+import { http } from '@/lib/http'
 
-export default function ClientForm({ onSubmit }) {
-  // 1. Define your form.
+export default function ClientForm() {
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: { urls: [{ icon: '', title: '', url: '' }] },
@@ -23,7 +24,7 @@ export default function ClientForm({ onSubmit }) {
 
   async function handleSubmit(values: z.infer<typeof formSchema>) {
     console.log('onSubmit1', values)
-    const result = await onSubmit(values)
+    const result = await createTopic(values)
     toast({
       // title: 'You submitted the following values:',
       description: JSON.stringify(result),
@@ -47,7 +48,21 @@ export default function ClientForm({ onSubmit }) {
           )}
         />
         {fields.map((field, index) => (
-          <div key={field.id} className="space-y-4 p-4 border rounded-md">
+          <div key={field.id} className="space-y-4 p-4 border rounded-md relative group">
+            {fields.length > 1 && (
+              <div className="absolute top-0 right-0 hidden group-hover:block">
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="h-8 w-8 text-red-500 hover:text-red-700"
+                  onClick={() => {
+                    remove(index)
+                  }}
+                >
+                  <Trash2 className="h-5 w-5" />
+                </Button>
+              </div>
+            )}
             <FormField
               name={`urls.${index}.title`}
               render={({ field }) => (
@@ -69,7 +84,30 @@ export default function ClientForm({ onSubmit }) {
                   <div className="flex items-center space-x-4">
                     <FormLabel className="flex-shrink-0 w-20">网址</FormLabel>
                     <FormControl>
-                      <Input placeholder="https://example.com" {...field} />
+                      <div className="flex flex-1 gap-2">
+                        <Input className="flex-1" placeholder="https://example.com" {...field} />{' '}
+                        <Button
+                          type="button"
+                          onClick={async () => {
+                            const result = await form.trigger(`urls.${index}.url`)
+                            if (!result) {
+                              return
+                            }
+                            const { title, icon, description } = await http.get<{
+                              title: string
+                              icon: string
+                              description: string
+                            }>('/api/resolveUrl', {
+                              url: field.value,
+                            })
+                            form.setValue(`urls.${index}.title`, title)
+                            form.setValue(`urls.${index}.icon`, icon)
+                            form.setValue(`urls.${index}.description`, description)
+                          }}
+                        >
+                          解析网址
+                        </Button>
+                      </div>
                     </FormControl>
                   </div>
                   <FormMessage />
@@ -104,15 +142,9 @@ export default function ClientForm({ onSubmit }) {
                 </FormItem>
               )}
             />
-            {index > 0 && (
-              <Button type="button" variant="destructive" size="sm" onClick={() => remove(index)}>
-                <X className="h-4 w-4 mr-2" />
-                删除此网址
-              </Button>
-            )}
           </div>
         ))}
-        <Button type="button" variant="outline" size="sm" className="mt-2" onClick={() => append({})}>
+        <Button type="button" variant="outline" onClick={() => append({ title: '', url: '' })}>
           <PlusCircle className="h-4 w-4 mr-2" />
           添加网址
         </Button>
