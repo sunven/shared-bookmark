@@ -161,6 +161,25 @@ export async function getAllTags() {
   return prisma.tag.findMany()
 }
 
+export async function getTopicList() {
+  return prisma.topic.findMany({
+    orderBy: {
+      createdAt: 'desc',
+    },
+    select: {
+      id: true,
+      name: true,
+      createdAt: true,
+      updatedAt: true,
+      _count: {
+        select: {
+          urls: true,
+        },
+      },
+    },
+  })
+}
+
 export async function createTopic(data: {
   name: string
   urls: {
