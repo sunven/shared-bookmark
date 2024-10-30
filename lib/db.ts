@@ -171,6 +171,12 @@ export async function getTopicList() {
       name: true,
       createdAt: true,
       updatedAt: true,
+      urls: {
+        select: {
+          icon: true,
+          title: true,
+        },
+      },
       _count: {
         select: {
           urls: true,
