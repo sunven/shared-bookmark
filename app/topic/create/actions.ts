@@ -1,7 +1,7 @@
 'use server'
 
 import { z } from 'zod'
-import { createTopic as createTopic1 } from '../../lib/db'
+import { createTopic as createTopic1 } from '../../../lib/db'
 import { formSchema } from './schema'
 
 export async function createTopic(values: z.infer<typeof formSchema>) {

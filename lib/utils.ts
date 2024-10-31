@@ -1,5 +1,6 @@
 import { toast } from '@/hooks/use-toast'
 import { clsx, type ClassValue } from 'clsx'
+import { NextResponse } from 'next/server'
 import { twMerge } from 'tailwind-merge'
 
 export function cn(...inputs: ClassValue[]) {
@@ -20,4 +21,12 @@ export function toastError(msg: string) {
     title: 'error',
     description: msg,
   })
+}
+
+export function okResponse(data?: unknown) {
+  return NextResponse.json({ status: 0, data })
+}
+
+export function errorResponse(message: string) {
+  return NextResponse.json({ status: -1, message })
 }

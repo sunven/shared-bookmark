@@ -69,8 +69,12 @@ class HttpClient {
         toastError(msg)
         throw new Error(msg)
       }
-
-      return await response.json()
+      const { message, data, status } = await response.json()
+      if (status === -1) {
+        toastError(message)
+        return Promise.reject(message)
+      }
+      return data
     } catch (error) {
       if (error instanceof Error) {
         if (error.name === 'AbortError') {
