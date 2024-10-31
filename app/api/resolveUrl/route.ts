@@ -1,12 +1,11 @@
-// app/api/fetch-url/route.ts
-import { NextResponse } from 'next/server'
 import * as cheerio from 'cheerio'
+import { errorResponse, okResponse } from '@/lib/utils'
 
 export async function GET(request: Request) {
   const { searchParams } = new URL(request.url)
   const url = searchParams.get('url')
   if (!url) {
-    return NextResponse.json({ message: 'URL is required' }, { status: 400 })
+    return errorResponse('URL is required')
   }
 
   try {
@@ -14,12 +13,22 @@ export async function GET(request: Request) {
     const html = await response.text()
     const $ = cheerio.load(html)
     const title = $('title').text() || ''
-    const icon = getUrl($('link[rel="icon"]').attr('href'), url)
+    const icon = getUrl(getIconHref($), url)
     const description = $('meta[name="description"]').attr('content') || ''
-    return NextResponse.json({ title, icon, description })
+    return okResponse({ title, icon, description })
   } catch (error) {
     console.error('Error fetching URL data:', error)
-    return NextResponse.json({ message: 'Error fetching URL data' }, { status: 500 })
+    return errorResponse('Error fetching URL data')
+  }
+}
+
+function getIconHref($: cheerio.CheerioAPI) {
+  const arr = ['link[rel="icon"]', 'link[rel="shortcut icon"]']
+  for (const selector of arr) {
+    const url = $(selector).attr('href')
+    if (url) {
+      return url
+    }
   }
 }
 

@@ -64,27 +64,15 @@ class HttpClient {
 
       clearTimeout(timeoutId)
 
+      const { message, data } = await response.json()
       if (!response.ok) {
-        const msg = `HTTP error! status: ${response.status}`
-        toastError(msg)
-        throw new Error(msg)
-      }
-      const { message, data, status } = await response.json()
-      if (status === -1) {
         toastError(message)
         return Promise.reject(message)
       }
+
       return data
     } catch (error) {
-      if (error instanceof Error) {
-        if (error.name === 'AbortError') {
-          const msg = 'Request timed out'
-          toastError(msg)
-          throw new Error('Request timed out')
-        }
-      }
-      toastError((error as Error).message)
-      throw error
+      return Promise.reject(error)
     }
   }
 

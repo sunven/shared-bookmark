@@ -175,6 +175,7 @@ export async function getTopicList() {
         select: {
           icon: true,
           title: true,
+          description: true,
         },
       },
       _count: {

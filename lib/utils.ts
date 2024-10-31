@@ -24,9 +24,9 @@ export function toastError(msg: string) {
 }
 
 export function okResponse(data?: unknown) {
-  return NextResponse.json({ status: 0, data })
+  return NextResponse.json({ data })
 }
 
-export function errorResponse(message: string) {
-  return NextResponse.json({ status: -1, message })
+export function errorResponse(message: string, status: number = 500) {
+  return NextResponse.json({ message }, { status })
 }

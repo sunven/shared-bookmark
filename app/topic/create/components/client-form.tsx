@@ -5,13 +5,14 @@ import { Input } from '@/components/ui/input'
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form'
 import { useFieldArray, useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { toast } from '@/hooks/use-toast'
 import { PlusCircle, Trash2 } from 'lucide-react'
 import { formSchema } from '../schema'
 import { createTopic } from '../actions'
 import { http } from '@/lib/http'
+import { useRouter } from 'next/navigation'
 
 export default function ClientForm() {
+  const router = useRouter()
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -30,12 +31,8 @@ export default function ClientForm() {
   })
 
   async function handleSubmit(values: z.infer<typeof formSchema>) {
-    console.log('onSubmit1', values)
-    const result = await createTopic(values)
-    toast({
-      // title: 'You submitted the following values:',
-      description: JSON.stringify(result),
-    })
+    await createTopic(values)
+    router.push('/topic/list')
   }
   return (
     <Form {...form}>

@@ -2,10 +2,12 @@ import * as React from 'react'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card'
 import { getTopicList } from '@/lib/db'
-import { Edit, Share2 } from 'lucide-react'
+import { CalendarDays, Edit, Share2 } from 'lucide-react'
 import Link from 'next/link'
 
 import { DeleteTopicDialog } from './delete-topic-dialog'
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
+import { HoverCard, HoverCardContent, HoverCardTrigger } from '@/components/ui/hover-card'
 
 export default async function CardWithForm() {
   const topics = await getTopicList()
@@ -36,12 +38,27 @@ export default async function CardWithForm() {
             <CardContent className="grid gap-4">
               <div>
                 {topic.urls.map((url, index) => (
-                  <div key={index} className="grid grid-cols-[25px_1fr] items-start last:mb-0 last:pb-0">
-                    <span className="flex h-2 w-2 translate-y-1 rounded-full bg-sky-500" />
-                    <div className="space-y-1">
-                      <p className="text-sm font-medium leading-none">{url.title}</p>
-                      <p className="text-sm text-muted-foreground">{url.icon}</p>
-                    </div>
+                  <div key={index} className="">
+                    <HoverCard>
+                      <HoverCardTrigger asChild>
+                        <Button variant="link">{url.title}</Button>
+                      </HoverCardTrigger>
+                      <HoverCardContent className="w-80">
+                        <div className="flex justify-between space-x-4">
+                          <Avatar>
+                            <AvatarImage src={url.icon || ''} />
+                            <AvatarFallback>icon</AvatarFallback>
+                          </Avatar>
+                          <div className="space-y-1">
+                            <p className="text-sm">{url.description}</p>
+                            <div className="flex items-center pt-2">
+                              <CalendarDays className="mr-2 h-4 w-4 opacity-70" />{' '}
+                              <span className="text-xs text-muted-foreground">Joined December 2021</span>
+                            </div>
+                          </div>
+                        </div>
+                      </HoverCardContent>
+                    </HoverCard>
                   </div>
                 ))}
               </div>
