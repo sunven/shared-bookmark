@@ -21,9 +21,11 @@ export default async function CardWithForm() {
         {topics.map(topic => (
           <Card key={topic.id} className="w-[350px]  group relative">
             <div className="absolute right-2 top-2 flex gap-2 opacity-0 transition-opacity group-hover:opacity-100">
-              <Button variant="ghost" size="icon" className="h-8 w-8">
-                <Edit className="h-4 w-4" />
-              </Button>
+              <Link href={'/topic/edit/' + topic.id}>
+                <Button variant="ghost" size="icon" className="h-8 w-8">
+                  <Edit className="h-4 w-4" />
+                </Button>
+              </Link>
               <Button variant="ghost" size="icon" className="h-8 w-8">
                 <Share2 className="h-4 w-4" />
               </Button>
