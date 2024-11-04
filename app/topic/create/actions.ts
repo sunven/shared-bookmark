@@ -1,15 +1,20 @@
 'use server'
 
 import { z } from 'zod'
-import { createTopic as createTopic1 } from '../../../lib/db'
+import { createTopic, updateTopic } from '../../../lib/db'
 import { formSchema } from './schema'
 
-export async function createTopic(values: z.infer<typeof formSchema>) {
+export async function upsertTopic(values: z.infer<typeof formSchema>) {
   console.log('values', values)
   try {
     const validatedData = formSchema.parse(values)
     console.log('validatedData', validatedData)
-    return await createTopic1(validatedData)
+    if (values.id) {
+      return await updateTopic(values)
+    } else {
+      return await createTopic(values)
+    }
+    // return await createTopic(validatedData)
   } catch (error) {
     if (error instanceof z.ZodError) {
       // 返回验证错误

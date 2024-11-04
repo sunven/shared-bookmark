@@ -1,6 +1,24 @@
-import ClientForm from './components/client-form'
+import prisma from '@/lib/prisma'
+import ClientForm, { ClientFormProps } from '../../create/components/client-form'
 
-export default function TopicForm({ params }: { params: { id: string } }) {
-  console.log(params)
-  return <ClientForm></ClientForm>
+export default async function EditTopic({ params }: { params: { id: string } }) {
+  const data = params.id
+    ? await prisma.topic.findFirst({
+        where: {
+          id: params.id,
+        },
+        select: {
+          name: true,
+          urls: {
+            select: {
+              title: true,
+              url: true,
+              icon: true,
+              description: true,
+            },
+          },
+        },
+      })
+    : undefined
+  return <ClientForm data={data as ClientFormProps['data']}></ClientForm>
 }

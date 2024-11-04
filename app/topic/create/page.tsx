@@ -1,5 +1,5 @@
 import ClientForm from './components/client-form'
 
-export default function TopicForm() {
+export default function CreateTopic() {
   return <ClientForm></ClientForm>
 }

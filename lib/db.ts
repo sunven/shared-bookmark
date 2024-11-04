@@ -1,5 +1,24 @@
-import { Category, Prisma, Software, Tag } from '@prisma/client'
+import type { Category, Prisma, Software, Tag, Topic, Url } from '@prisma/client'
 import prisma from './prisma'
+
+// type NullToUndefined<T> = {
+//   [K in keyof T]: null extends T[K] ? undefined | Exclude<T[K], null> : T[K]
+// }
+
+type BaseEntity = {
+  id: number
+  createdAt: Date
+  updatedAt: Date
+}
+
+type NullToUndefined<T> = {
+  [K in keyof T as null extends T[K] ? K : never]?: undefined | Exclude<T[K], null>
+} & {
+  [K in keyof T as null extends T[K] ? never : K]: T[K]
+}
+
+type TopicDto = Omit<NullToUndefined<Topic>, keyof BaseEntity>
+type UrlDto = Omit<NullToUndefined<Url>, keyof BaseEntity>
 
 export interface SoftwareInput {
   name: string
@@ -187,15 +206,7 @@ export async function getTopicList() {
   })
 }
 
-export async function createTopic(data: {
-  name: string
-  urls: {
-    icon?: string
-    title: string
-    url: string
-    description?: string
-  }[]
-}) {
+export async function createTopic(data: { name: string; urls: Prisma.UrlCreateWithoutTopicInput[] }) {
   return prisma.topic.create({
     data: {
       name: data.name,
@@ -204,5 +215,27 @@ export async function createTopic(data: {
       },
     },
     select: { id: true },
+  })
+}
+
+export function updateTopic(data: {
+  id: string
+  name: string
+  createMany: Prisma.UrlCreateWithoutTopicInput[]
+  updateMany: Prisma.UrlUncheckedUpdateWithoutTopicInput[]
+  deleteMany: number[]
+}) {
+  return prisma.topic.update({
+    where: { id: data.id },
+    data: {
+      urls: {
+        createMany: { data: data.createMany },
+        updateMany: data.updateMany.map(({ id, ...rest }) => ({
+          where: { id: id as number },
+          data: rest,
+        })),
+        deleteMany: data.deleteMany.map(c => ({ id: c })),
+      },
+    },
   })
 }

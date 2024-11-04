@@ -1,6 +1,7 @@
 import { z } from 'zod'
 
 const urlSchema = z.object({
+  id: z.number().optional(),
   icon: z.string().optional(),
   title: z.string().min(1, { message: '不能为空。' }),
   url: z.string().url({ message: '请输入有效的URL。' }),
@@ -8,6 +9,7 @@ const urlSchema = z.object({
 })
 
 export const formSchema = z.object({
+  id: z.number().optional(),
   name: z.string().min(1, {
     message: '不能为空。',
   }),
