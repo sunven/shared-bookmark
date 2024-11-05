@@ -10,23 +10,28 @@ import { formSchema } from '../schema'
 import { upsertTopic } from '../actions'
 import { http } from '@/lib/http'
 import { useRouter } from 'next/navigation'
+import { getTopic } from '@/lib/db'
 
 export interface ClientFormProps {
-  data?: z.infer<typeof formSchema> | null
+  data?: Awaited<ReturnType<typeof getTopic>>
 }
 
 export default function ClientForm({ data }: ClientFormProps) {
   const router = useRouter()
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
-    defaultValues: data || {
-      urls: [
-        {
-          title: '',
-          url: '',
+    defaultValues: data
+      ? {
+          ...data,
+          urls: data.urls.map(url => ({
+            ...url,
+            icon: url.icon || undefined,
+            description: url.description || undefined,
+          })),
+        }
+      : {
+          urls: [{ title: '', url: '' }],
         },
-      ],
-    },
   })
 
   const { fields, append, remove } = useFieldArray({
@@ -35,20 +40,7 @@ export default function ClientForm({ data }: ClientFormProps) {
   })
 
   async function handleSubmit(values: z.infer<typeof formSchema>) {
-    // if (values.id) {
-    //   const originalIds = values.urls.map(c => c.id)
-    //   const ids = values.urls.map(c => c.id)
-    //   return await updateTopic({
-    //     id: values.id,
-    //     name: values.name,
-    //     createMany: values.urls.filter(c => !c.id),
-    //     updateMany: values.urls.filter(c => ids.includes(c.id)),
-    //     deleteMany: originalIds.filter(c => !ids.includes(c)),
-    //   })
-    // } else {
-    //   return await createTopic(values)
-    // }
-    await upsertTopic(values)
+    await upsertTopic(values, data)
     router.push('/topic/list')
   }
   return (

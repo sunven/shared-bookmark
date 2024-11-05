@@ -206,6 +206,27 @@ export async function getTopicList() {
   })
 }
 
+export function getTopic(id: string) {
+  return prisma.topic.findFirst({
+    where: {
+      id,
+    },
+    select: {
+      id: true,
+      name: true,
+      urls: {
+        select: {
+          id: true,
+          title: true,
+          url: true,
+          icon: true,
+          description: true,
+        },
+      },
+    },
+  })
+}
+
 export async function createTopic(data: { name: string; urls: Prisma.UrlCreateWithoutTopicInput[] }) {
   return prisma.topic.create({
     data: {
@@ -228,13 +249,18 @@ export function updateTopic(data: {
   return prisma.topic.update({
     where: { id: data.id },
     data: {
+      name: data.name,
       urls: {
         createMany: { data: data.createMany },
         updateMany: data.updateMany.map(({ id, ...rest }) => ({
           where: { id: id as number },
           data: rest,
         })),
-        deleteMany: data.deleteMany.map(c => ({ id: c })),
+        deleteMany: {
+          id: {
+            in: data.deleteMany,
+          },
+        },
       },
     },
   })

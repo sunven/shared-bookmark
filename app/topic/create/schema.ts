@@ -9,7 +9,7 @@ const urlSchema = z.object({
 })
 
 export const formSchema = z.object({
-  id: z.number().optional(),
+  id: z.string().optional(),
   name: z.string().min(1, {
     message: '不能为空。',
   }),
