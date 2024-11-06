@@ -13,11 +13,11 @@ export default async function CardWithForm() {
   const topics = await getTopicList()
   console.log(topics)
   return (
-    <div>
+    <div className="p-4">
       <Link href="/topic/create">
         <Button>创建话题</Button>
       </Link>
-      <div className="flex flex-wrap gap-4">
+      <div className="flex flex-wrap gap-4 mt-4">
         {topics.map(topic => (
           <Card key={topic.id} className="w-[350px]  group relative">
             <div className="absolute right-2 top-2 flex gap-2 opacity-0 transition-opacity group-hover:opacity-100">
@@ -39,29 +39,31 @@ export default async function CardWithForm() {
             </CardHeader>
             <CardContent className="grid gap-4">
               <div>
-                {topic.urls.map((url, index) => (
-                  <div key={index} className="">
-                    <HoverCard>
-                      <HoverCardTrigger asChild>
-                        <Button variant="link">{url.title}</Button>
-                      </HoverCardTrigger>
-                      <HoverCardContent className="w-80">
-                        <div className="flex justify-between space-x-4">
-                          <Avatar>
-                            <AvatarImage src={url.icon || ''} />
-                            <AvatarFallback>icon</AvatarFallback>
-                          </Avatar>
-                          <div className="space-y-1">
-                            <p className="text-sm">{url.description}</p>
-                            <div className="flex items-center pt-2">
-                              <CalendarDays className="mr-2 h-4 w-4 opacity-70" />{' '}
-                              <span className="text-xs text-muted-foreground">Joined December 2021</span>
-                            </div>
-                          </div>
+                {topic.urls.map((item, index) => (
+                  <HoverCard key={index}>
+                    <HoverCardTrigger asChild>
+                      <Button className="p-0 h-6 flex gap-1" variant="link">
+                        <Avatar className="w-5 h-5">
+                          <AvatarImage src={item.icon || ''} />
+                          <AvatarFallback>img</AvatarFallback>
+                        </Avatar>
+                        <Link target="_blank" href={item.url}>
+                          {item.title}
+                        </Link>
+                      </Button>
+                    </HoverCardTrigger>
+                    <HoverCardContent className="w-80">
+                      <div className="flex justify-between space-x-4">
+                        <Avatar>
+                          <AvatarImage src={item.icon || ''} />
+                          <AvatarFallback>icon</AvatarFallback>
+                        </Avatar>
+                        <div className="space-y-1">
+                          <p className="text-sm">{item.description}</p>
                         </div>
-                      </HoverCardContent>
-                    </HoverCard>
-                  </div>
+                      </div>
+                    </HoverCardContent>
+                  </HoverCard>
                 ))}
               </div>
             </CardContent>
