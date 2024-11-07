@@ -38,34 +38,32 @@ export default async function CardWithForm() {
               </CardDescription>
             </CardHeader>
             <CardContent className="grid gap-4">
-              <div>
-                {topic.urls.map((item, index) => (
-                  <HoverCard key={index}>
-                    <HoverCardTrigger asChild>
-                      <Button className="p-0 h-6 flex gap-1" variant="link">
-                        <Avatar className="w-5 h-5">
-                          <AvatarImage src={item.icon || ''} />
-                          <AvatarFallback>img</AvatarFallback>
-                        </Avatar>
-                        <Link target="_blank" href={item.url}>
-                          {item.title}
-                        </Link>
-                      </Button>
-                    </HoverCardTrigger>
-                    <HoverCardContent className="w-80">
-                      <div className="flex justify-between space-x-4">
-                        <Avatar>
-                          <AvatarImage src={item.icon || ''} />
-                          <AvatarFallback>icon</AvatarFallback>
-                        </Avatar>
-                        <div className="space-y-1">
-                          <p className="text-sm">{item.description}</p>
-                        </div>
+              {topic.urls.map((item, index) => (
+                <HoverCard key={index}>
+                  <HoverCardTrigger asChild>
+                    <Button className="p-0 h-6 flex gap-2 overflow-hidden justify-start" variant="link">
+                      <Avatar className="w-5 h-5">
+                        <AvatarImage src={item.icon || ''} />
+                        <AvatarFallback>img</AvatarFallback>
+                      </Avatar>
+                      <Link target="_blank" href={item.url} className="truncate">
+                        {item.title}
+                      </Link>
+                    </Button>
+                  </HoverCardTrigger>
+                  <HoverCardContent className="w-80">
+                    <div className="flex justify-between space-x-4">
+                      <Avatar>
+                        <AvatarImage src={item.icon || ''} />
+                        <AvatarFallback>icon</AvatarFallback>
+                      </Avatar>
+                      <div className="space-y-1">
+                        <p className="text-sm">{item.description}</p>
                       </div>
-                    </HoverCardContent>
-                  </HoverCard>
-                ))}
-              </div>
+                    </div>
+                  </HoverCardContent>
+                </HoverCard>
+              ))}
             </CardContent>
           </Card>
         ))}
