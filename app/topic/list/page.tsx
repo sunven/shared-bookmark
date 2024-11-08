@@ -33,11 +33,9 @@ export default async function CardWithForm() {
             </div>
             <CardHeader>
               <CardTitle>{topic.name}</CardTitle>
-              <CardDescription>
-                {topic._count.urls} 个链接 | {topic.createdAt.toLocaleString()}
-              </CardDescription>
+              <CardDescription>{topic.createdAt.toLocaleString()}</CardDescription>
             </CardHeader>
-            <CardContent className="grid gap-4">
+            <CardContent className="grid gap-1">
               {topic.urls.map((item, index) => (
                 <HoverCard key={index}>
                   <HoverCardTrigger asChild>
