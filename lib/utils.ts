@@ -2,6 +2,7 @@ import { toast } from '@/hooks/use-toast'
 import { clsx, type ClassValue } from 'clsx'
 import { NextResponse } from 'next/server'
 import { twMerge } from 'tailwind-merge'
+import * as cheerio from 'cheerio'
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs))
@@ -29,4 +30,45 @@ export function okResponse(data?: unknown) {
 
 export function errorResponse(message: string, status: number = 500) {
   return NextResponse.json({ message }, { status })
+}
+
+export async function resolveUrl(urlList: string[]) {
+  return new Promise(async resolve => {
+    const values = await Promise.all(urlList.map(url => fetch(url)))
+    const result = []
+    for (let i = 0; i < values.length; i++) {
+      const response = values[i]
+      const html = await response.text()
+      const $ = cheerio.load(html)
+      const title = $('title').text() || ''
+      const icon = getUrl(getIconHref($), urlList[i])
+      const description = $('meta[name="description"]').attr('content') || ''
+      result.push({ title, icon, description })
+    }
+    resolve(result)
+  })
+}
+
+function getIconHref($: cheerio.CheerioAPI) {
+  const arr = ['link[rel="icon"]', 'link[rel="shortcut icon"]']
+  for (const selector of arr) {
+    const url = $(selector).attr('href')
+    if (url) {
+      return url
+    }
+  }
+}
+
+function getUrl(url: string | undefined, websiteUrl: string) {
+  if (!url) {
+    return url
+  }
+  const parsedUrl = new URL(websiteUrl)
+  if (url.startsWith('//')) {
+    return parsedUrl.protocol + url
+  } else if (url.startsWith('/')) {
+    return parsedUrl.origin + url
+  } else {
+    return url
+  }
 }

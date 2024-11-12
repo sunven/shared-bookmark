@@ -1,5 +1,4 @@
-import * as cheerio from 'cheerio'
-import { errorResponse, okResponse } from '@/lib/utils'
+import { errorResponse, okResponse, resolveUrl } from '@/lib/utils'
 
 export async function GET(request: Request) {
   const { searchParams } = new URL(request.url)
@@ -9,39 +8,11 @@ export async function GET(request: Request) {
   }
 
   try {
-    const response = await fetch(url)
-    const html = await response.text()
-    const $ = cheerio.load(html)
-    const title = $('title').text() || ''
-    const icon = getUrl(getIconHref($), url)
-    const description = $('meta[name="description"]').attr('content') || ''
-    return okResponse({ title, icon, description })
+    const result = await resolveUrl([url])
+    console.log('result', result)
+    return okResponse(result[0])
   } catch (error) {
     console.error('Error fetching URL data:', error)
     return errorResponse('Error fetching URL data')
-  }
-}
-
-function getIconHref($: cheerio.CheerioAPI) {
-  const arr = ['link[rel="icon"]', 'link[rel="shortcut icon"]']
-  for (const selector of arr) {
-    const url = $(selector).attr('href')
-    if (url) {
-      return url
-    }
-  }
-}
-
-function getUrl(url: string | undefined, websiteUrl: string) {
-  if (!url) {
-    return url
-  }
-  const parsedUrl = new URL(websiteUrl)
-  if (url.startsWith('//')) {
-    return parsedUrl.protocol + url
-  } else if (url.startsWith('/')) {
-    return parsedUrl.origin + url
-  } else {
-    return url
   }
 }
