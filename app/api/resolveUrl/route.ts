@@ -9,7 +9,6 @@ export async function GET(request: Request) {
 
   try {
     const result = await resolveUrl([url])
-    console.log('result', result)
     return okResponse(result[0])
   } catch (error) {
     console.error('Error fetching URL data:', error)

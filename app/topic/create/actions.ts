@@ -5,10 +5,8 @@ import { createTopic, getTopic, updateTopic } from '../../../lib/db'
 import { formSchema } from './schema'
 
 export async function upsertTopic(values: z.infer<typeof formSchema>, data?: Awaited<ReturnType<typeof getTopic>>) {
-  console.log('values', values)
   try {
-    const validatedData = formSchema.parse(values)
-    console.log('validatedData', validatedData)
+    // const validatedData = formSchema.parse(values)
     if (data) {
       const originalIds = data.urls.map(c => c.id!)
       const ids = values.urls.map(c => c.id)

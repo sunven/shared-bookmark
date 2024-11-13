@@ -1,8 +1,8 @@
 import * as React from 'react'
 import { Button } from '@/components/ui/button'
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card'
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { getTopicList } from '@/lib/db'
-import { CalendarDays, Edit, Share2 } from 'lucide-react'
+import { Edit, Share2 } from 'lucide-react'
 import Link from 'next/link'
 
 import { DeleteTopicDialog } from './delete-topic-dialog'
@@ -11,7 +11,6 @@ import { HoverCard, HoverCardContent, HoverCardTrigger } from '@/components/ui/h
 
 export default async function CardWithForm() {
   const topics = await getTopicList()
-  console.log(topics)
   return (
     <div className="p-4">
       <Link href="/topic/create">

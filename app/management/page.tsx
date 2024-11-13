@@ -55,7 +55,6 @@ export default function SoftwareManagement() {
 
   const handleDelete = (id: number) => {
     http.delete('/api/management', { id }).then(res => {
-      console.log('res', res)
       mutate()
     })
   }

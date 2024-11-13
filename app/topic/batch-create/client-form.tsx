@@ -5,21 +5,26 @@ import { useForm } from 'react-hook-form'
 import { z } from 'zod'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { Textarea } from '@/components/ui/textarea'
-
-const formSchema = z.object({
-  urls: z.string().min(1, {
-    message: '不能为空。',
-  }),
-})
+import { formSchema } from './schema'
+import { Input } from '@/components/ui/input'
+import { upsertTopic } from './actions'
+import to from 'await-to-js'
+import { useRouter } from 'next/navigation'
 
 export default function ClientForm() {
+  const router = useRouter()
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
       urls: '',
     },
   })
-  const handleSubmit = () => {}
+  async function handleSubmit(values: z.infer<typeof formSchema>) {
+    const [error] = await to(upsertTopic(values))
+    if (!error) {
+      router.push('/topic/list')
+    }
+  }
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-8 mx-[25%]">
@@ -30,7 +35,21 @@ export default function ClientForm() {
               <div className="flex items-center space-x-4">
                 <FormLabel className="flex-shrink-0 w-20">标题</FormLabel>
                 <FormControl>
-                  <Textarea {...field} />
+                  <Input {...field} />
+                </FormControl>
+              </div>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+        <FormField
+          name="urls"
+          render={({ field }) => (
+            <FormItem>
+              <div className="flex items-center space-x-4">
+                <FormLabel className="flex-shrink-0 w-20">urls</FormLabel>
+                <FormControl>
+                  <Textarea {...field} placeholder="请输入url，每行一个" />
                 </FormControl>
               </div>
               <FormMessage />

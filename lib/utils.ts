@@ -32,18 +32,19 @@ export function errorResponse(message: string, status: number = 500) {
   return NextResponse.json({ message }, { status })
 }
 
-export async function resolveUrl(urlList: string[]) {
-  return new Promise(async resolve => {
+export async function resolveUrl<T>(urlList: string[]) {
+  return new Promise<T[]>(async resolve => {
     const values = await Promise.all(urlList.map(url => fetch(url)))
-    const result = []
+    const result: T[] = []
     for (let i = 0; i < values.length; i++) {
       const response = values[i]
       const html = await response.text()
       const $ = cheerio.load(html)
       const title = $('title').text() || ''
-      const icon = getUrl(getIconHref($), urlList[i])
+      const url = urlList[i]
+      const icon = getUrl(getIconHref($), url)
       const description = $('meta[name="description"]').attr('content') || ''
-      result.push({ title, icon, description })
+      result.push({ title, url, icon, description } as T)
     }
     resolve(result)
   })
