@@ -33,7 +33,11 @@ export default async function CardWithForm() {
               <DeleteTopicDialog topicId={topic.id} />
             </div>
             <CardHeader>
-              <CardTitle>{topic.name}</CardTitle>
+              <CardTitle>
+                <Link href={'/topic/' + topic.id}>
+                  <Button variant="link">{topic.name}</Button>
+                </Link>
+              </CardTitle>
               <CardDescription>{topic.createdAt.toLocaleString()}</CardDescription>
             </CardHeader>
             <CardContent className="grid gap-1">

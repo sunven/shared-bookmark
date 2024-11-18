@@ -215,6 +215,8 @@ export function getTopic(id: string) {
     select: {
       id: true,
       name: true,
+      createdAt: true,
+      updatedAt: true,
       urls: {
         select: {
           id: true,
