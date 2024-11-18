@@ -9,6 +9,8 @@ import { DeleteTopicDialog } from './delete-topic-dialog'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { HoverCard, HoverCardContent, HoverCardTrigger } from '@/components/ui/hover-card'
 
+export const dynamic = 'force-dynamic'
+
 export default async function CardWithForm() {
   const topics = await getTopicList()
   return (
