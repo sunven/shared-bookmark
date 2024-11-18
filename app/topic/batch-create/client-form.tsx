@@ -10,6 +10,7 @@ import { Input } from '@/components/ui/input'
 import { upsertTopic } from './actions'
 import to from 'await-to-js'
 import { useRouter } from 'next/navigation'
+import { toastError, toastOk } from '@/lib/utils'
 
 export default function ClientForm() {
   const router = useRouter()
@@ -21,7 +22,10 @@ export default function ClientForm() {
   })
   async function handleSubmit(values: z.infer<typeof formSchema>) {
     const [error] = await to(upsertTopic(values))
-    if (!error) {
+    if (error) {
+      toastError(error.message)
+    } else {
+      toastOk('创建成功')
       router.push('/topic/list')
     }
   }
@@ -49,7 +53,7 @@ export default function ClientForm() {
               <div className="flex items-center space-x-4">
                 <FormLabel className="flex-shrink-0 w-20">urls</FormLabel>
                 <FormControl>
-                  <Textarea {...field} placeholder="请输入url，每行一个" />
+                  <Textarea {...field} rows={10} placeholder="请输入url，每行一个" />
                 </FormControl>
               </div>
               <FormMessage />

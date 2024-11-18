@@ -20,6 +20,6 @@ export async function upsertTopic(values: z.infer<typeof formSchema>) {
     })
     return id
   } catch (error) {
-    return error
+    throw error
   }
 }

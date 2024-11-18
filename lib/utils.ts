@@ -16,6 +16,14 @@ export const fetcher = (key: string | ({ url: string } & Record<string, unknown>
   return fetch(url, rest).then(res => res.json())
 }
 
+export function toastOk(msg: string) {
+  toast({
+    variant: 'default',
+    title: 'success',
+    description: msg,
+  })
+}
+
 export function toastError(msg: string) {
   toast({
     variant: 'destructive',
@@ -33,20 +41,23 @@ export function errorResponse(message: string, status: number = 500) {
 }
 
 export async function resolveUrl<T>(urlList: string[]) {
-  return new Promise<T[]>(async resolve => {
-    const values = await Promise.all(urlList.map(url => fetch(url)))
-    const result: T[] = []
-    for (let i = 0; i < values.length; i++) {
-      const response = values[i]
-      const html = await response.text()
-      const $ = cheerio.load(html)
-      const title = $('title').text() || ''
-      const url = urlList[i]
-      const icon = getUrl(getIconHref($), url)
-      const description = $('meta[name="description"]').attr('content') || ''
-      result.push({ title, url, icon, description } as T)
-    }
-    resolve(result)
+  return new Promise<T[]>((resolve, reject) => {
+    Promise.all(urlList.map(url => fetch(url)))
+      .then(async values => {
+        const result: T[] = []
+        for (let i = 0; i < values.length; i++) {
+          const response = values[i]
+          const html = await response.text()
+          const $ = cheerio.load(html)
+          const title = $('title').text() || ''
+          const url = urlList[i]
+          const icon = getUrl(getIconHref($), url)
+          const description = $('meta[name="description"]').attr('content') || ''
+          result.push({ title, url, icon, description } as T)
+        }
+        resolve(result)
+      })
+      .catch(reject)
   })
 }
 
