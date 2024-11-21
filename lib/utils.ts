@@ -24,7 +24,7 @@ export function toastOk(msg: string) {
   })
 }
 
-export function toastError(msg: string) {
+export function toastError(msg?: string) {
   toast({
     variant: 'destructive',
     title: 'error',
@@ -32,12 +32,26 @@ export function toastError(msg: string) {
   })
 }
 
-export function okResponse(data?: unknown) {
-  return NextResponse.json({ data })
+export type JsonBodyType<T = unknown> = {
+  status: 0 | 1
+  data?: T
+  message?: string
+}
+
+export function okJsonBody<T>(data?: T): JsonBodyType<T> {
+  return { status: 0, data }
+}
+
+export function errorJsonBody<T>(message?: string): JsonBodyType<T> {
+  return { status: 1, message }
+}
+
+export function okResponse<T>(data?: T) {
+  return NextResponse.json(okJsonBody<T>(data))
 }
 
 export function errorResponse(message: string, status: number = 500) {
-  return NextResponse.json({ message }, { status })
+  return NextResponse.json(errorJsonBody(message), { status })
 }
 
 export async function resolveUrl<T>(urlList: string[]) {

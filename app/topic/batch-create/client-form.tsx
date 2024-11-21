@@ -8,30 +8,46 @@ import { Textarea } from '@/components/ui/textarea'
 import { formSchema } from './schema'
 import { Input } from '@/components/ui/input'
 import { upsertTopic } from './actions'
-import to from 'await-to-js'
 import { useRouter } from 'next/navigation'
-import { toastError, toastOk } from '@/lib/utils'
+import { JsonBodyType, toastError, toastOk } from '@/lib/utils'
+import { useFormState } from 'react-dom'
 
 export default function ClientForm() {
   const router = useRouter()
+
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
       urls: '',
     },
   })
-  async function handleSubmit(values: z.infer<typeof formSchema>) {
-    const [error] = await to(upsertTopic(values))
-    if (error) {
-      toastError(error.message)
-    } else {
-      toastOk('创建成功')
-      router.push('/topic/list')
-    }
-  }
+  const [_, action, isPending] = useFormState<JsonBodyType<string> | undefined, FormData>(
+    async (preState, formData) => {
+      // return await new Promise(resolve => {
+      //   setTimeout(() => {
+      //     resolve(undefined)
+      //   }, 1000)
+      // })
+      const result = await form.trigger()
+      if (result) {
+        return upsertTopic(preState, formData).then(data => {
+          const { status, message } = data
+          if (status === 0) {
+            toastOk('创建成功')
+            router.push('/topic/list')
+          } else {
+            toastError(message)
+          }
+          return data
+        })
+      }
+    },
+    undefined
+  )
+  // console.log('ClientForm', isPending)
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-8 mx-[25%]">
+      <form action={action} className="space-y-8 mx-[25%]">
         <FormField
           name="name"
           render={({ field }) => (
@@ -61,7 +77,9 @@ export default function ClientForm() {
           )}
         />
         <div className="flex justify-between">
-          <Button type="submit">提交</Button>
+          <Button disabled={isPending} type="submit">
+            {isPending ? '提交中...' : '提交'}
+          </Button>
         </div>
       </form>
     </Form>
