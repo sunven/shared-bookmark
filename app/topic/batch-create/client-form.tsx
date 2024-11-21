@@ -10,7 +10,7 @@ import { Input } from '@/components/ui/input'
 import { upsertTopic } from './actions'
 import { useRouter } from 'next/navigation'
 import { JsonBodyType, toastError, toastOk } from '@/lib/utils'
-import { useFormState } from 'react-dom'
+import { useActionState } from 'react'
 
 export default function ClientForm() {
   const router = useRouter()
@@ -21,7 +21,7 @@ export default function ClientForm() {
       urls: '',
     },
   })
-  const [_, action, isPending] = useFormState<JsonBodyType<string> | undefined, FormData>(
+  const [_, action, isPending] = useActionState<JsonBodyType<string> | undefined, FormData>(
     async (preState, formData) => {
       // return await new Promise(resolve => {
       //   setTimeout(() => {

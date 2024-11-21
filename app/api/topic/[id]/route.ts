@@ -1,7 +1,8 @@
 import prisma from '@/lib/prisma'
 import { errorResponse, okResponse } from '@/lib/utils'
 
-export async function DELETE(request: Request, { params }: { params: { id: string } }) {
+export async function DELETE(_: Request, segmentData: { params: Promise<{ id: string }> }) {
+  const params = await segmentData.params
   if (!params.id) {
     return errorResponse('id is required')
   }
