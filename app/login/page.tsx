@@ -3,15 +3,24 @@ import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
+import { AuthError } from 'next-auth'
 import Link from 'next/link'
 
 export default function SignIn() {
+  console.log('SignIn', process.env.AUTH_SECRET)
   return (
     <div className="flex h-screen w-full items-center justify-center px-4">
       <form
         action={async () => {
           'use server'
-          await signIn('google')
+          try {
+            await signIn('google')
+          } catch (error) {
+            if (error instanceof AuthError)
+              // Handle auth errors
+              console.log('error', error)
+            throw error // Rethrow all other errors
+          }
         }}
       >
         <button type="submit">Signin with Google</button>
