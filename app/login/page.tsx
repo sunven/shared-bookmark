@@ -1,31 +1,24 @@
-import { signIn } from '@/auth'
+'use client'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
-import { AuthError } from 'next-auth'
 import Link from 'next/link'
+import { useTransition } from 'react'
+import { signInAction } from './actions'
+import { BuiltInProviderType } from '@auth/core/providers'
 
-export default function SignIn() {
-  console.log('SignIn', process.env.AUTH_SECRET)
+export default function Login() {
+  const [isPending, startTransition] = useTransition()
+
+  const submitLogin = async (provider: BuiltInProviderType) => {
+    startTransition(() => {
+      signInAction(provider)
+    })
+  }
   return (
     <div className="flex h-screen w-full items-center justify-center px-4">
-      <form
-        action={async () => {
-          'use server'
-          try {
-            await signIn('google')
-          } catch (error) {
-            if (error instanceof AuthError)
-              // Handle auth errors
-              console.log('error', error)
-            throw error // Rethrow all other errors
-          }
-        }}
-      >
-        <button type="submit">Signin with Google</button>
-      </form>
-      {/* <Card className="mx-auto max-w-sm">
+      <Card className="mx-auto max-w-sm">
         <CardHeader>
           <CardTitle className="text-2xl">Login</CardTitle>
           <CardDescription>Enter your email below to login to your account</CardDescription>
@@ -48,7 +41,14 @@ export default function SignIn() {
             <Button type="submit" className="w-full">
               Login
             </Button>
-            <Button variant="outline" className="w-full">
+            <Button
+              variant="outline"
+              className="w-full"
+              disabled={isPending}
+              onClick={() => {
+                submitLogin('google')
+              }}
+            >
               Login with Google
             </Button>
           </div>
@@ -59,7 +59,7 @@ export default function SignIn() {
             </Link>
           </div>
         </CardContent>
-      </Card> */}
+      </Card>
     </div>
   )
 }

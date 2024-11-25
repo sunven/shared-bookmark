@@ -8,6 +8,7 @@ import Link from 'next/link'
 import { DeleteTopicDialog } from './delete-topic-dialog'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { HoverCard, HoverCardContent, HoverCardTrigger } from '@/components/ui/hover-card'
+import { Metadata } from 'next'
 
 export const dynamic = 'force-dynamic'
 

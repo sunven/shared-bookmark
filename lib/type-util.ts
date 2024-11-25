@@ -4,6 +4,8 @@
 //   [K in keyof T as null extends T[K] ? never : K]: T[K]
 // }
 
+import { unknown } from 'zod'
+
 export type NullToUndefined<T> = T extends Record<string, unknown>
   ? {
       [K in keyof T as null extends T[K] ? K : never]?: undefined | NullToUndefined<Exclude<T[K], null>>
@@ -27,3 +29,5 @@ export type NullToUndefined<T> = T extends Record<string, unknown>
 // }
 
 // type UserOptional = OptionalNullable<User>
+
+export type GetFirstArg<T> = T extends (...args: infer Args) => unknown ? Args[0] : never
