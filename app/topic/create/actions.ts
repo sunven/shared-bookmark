@@ -8,10 +8,10 @@ export async function upsertTopic(values: z.infer<typeof formSchema>, data?: Awa
   try {
     // const validatedData = formSchema.parse(values)
     if (data) {
-      const originalIds = data.urls.map(c => c.id!)
+      const originalIds = data.urls.map(c => c.id)
       const ids = values.urls.map(c => c.id)
       return await updateTopic({
-        id: data.id!,
+        id: data.id,
         name: values.name,
         createMany: values.urls.filter(c => !c.id),
         updateMany: values.urls.filter(c => c.id),

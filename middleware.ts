@@ -4,8 +4,11 @@ import { errorResponse } from './lib/utils'
 export default auth(req => {
   if (!req.auth && req.nextUrl.pathname !== '/login') {
     if (req.nextUrl.pathname.startsWith('/api')) {
-      if (!req.nextUrl.pathname.startsWith('/api/auth/callback')) {
-        return errorResponse('Not authenticated', 401)
+      if (
+        !req.nextUrl.pathname.startsWith('/api/auth/callback') &&
+        !req.nextUrl.pathname.startsWith('/api/auth/error')
+      ) {
+        return errorResponse('not authenticated', 401)
       }
     } else {
       const newUrl = new URL('/login', req.nextUrl.origin)

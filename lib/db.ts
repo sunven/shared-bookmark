@@ -266,5 +266,8 @@ export function updateTopic(data: {
         },
       },
     },
+    include: {
+      urls: true,
+    },
   })
 }

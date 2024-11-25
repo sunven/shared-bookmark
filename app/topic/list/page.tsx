@@ -24,9 +24,9 @@ export default async function CardWithForm() {
           <Button>批量创建话题</Button>
         </Link>
       </div>
-      <div className="flex flex-wrap gap-4 mt-4">
+      <div className="grid grid-cols-5 gap-4 mt-4">
         {topics.map(topic => (
-          <Card key={topic.id} className="w-[350px] h-[200px] overflow-hidden group relative">
+          <Card key={topic.id} className="h-[200px] overflow-hidden group relative">
             <div className="absolute right-2 top-2 flex gap-2 opacity-0 transition-opacity group-hover:opacity-100">
               <Link href={'/topic/edit/' + topic.id}>
                 <Button variant="ghost" size="icon" className="h-8 w-8">

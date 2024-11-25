@@ -36,6 +36,7 @@ export default function ClientForm({ data }: ClientFormProps) {
 
   const { fields, append, remove } = useFieldArray({
     control: form.control,
+    keyName: 'key',
     name: 'urls',
   })
 
@@ -61,7 +62,7 @@ export default function ClientForm({ data }: ClientFormProps) {
           )}
         />
         {fields.map((field, index) => (
-          <div key={field.id} className="space-y-4 p-4 border rounded-md relative group">
+          <div key={field.key} className="space-y-4 p-4 border rounded-md relative group">
             {fields.length > 1 && (
               <div className="absolute top-0 right-0 hidden group-hover:block">
                 <Button

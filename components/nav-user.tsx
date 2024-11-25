@@ -12,7 +12,7 @@ export function NavUser() {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <div className=" flex items-center space-x-4 rounded-md border p-4">
+        <div className="flex items-center space-x-4 p-4">
           <Avatar className="h-8 w-8">
             <AvatarImage src={data?.user?.image || ''} alt={data?.user?.name || ''} />
             <AvatarFallback className="rounded-lg">
@@ -25,7 +25,7 @@ export function NavUser() {
           </div>
         </div>
       </DropdownMenuTrigger>
-      <DropdownMenuContent className="w-56">
+      <DropdownMenuContent>
         <DropdownMenuItem onClick={() => signOut()}>
           <LogOut />
           <span>Log out</span>
