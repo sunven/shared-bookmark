@@ -7,6 +7,7 @@ import Link from 'next/link'
 import { useTransition } from 'react'
 import { signInAction } from './actions'
 import { BuiltInProviderType } from '@auth/core/providers'
+import Image from 'next/image'
 
 export default function Login() {
   const [isPending, startTransition] = useTransition()
@@ -49,11 +50,17 @@ export default function Login() {
                 submitLogin('google')
               }}
             >
+              <Image
+                alt="google"
+                src="https://fonts.gstatic.com/s/i/productlogos/googleg/v6/24px.svg"
+                width={24}
+                height={24}
+              />
               Login with Google
             </Button>
           </div>
           <div className="mt-4 text-center text-sm">
-            Don&apos;t have an account?{' '}
+            Don&apos;t have an account?
             <Link href="#" className="underline">
               Sign up
             </Link>
