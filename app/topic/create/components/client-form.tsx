@@ -11,6 +11,8 @@ import { upsertTopic } from '../actions'
 import { http } from '@/lib/http'
 import { useRouter } from 'next/navigation'
 import { getTopic } from '@/lib/db'
+import { JsonBodyType, toastError, toastOk } from '@/lib/utils'
+import to from 'await-to-js'
 
 export interface ClientFormProps {
   data?: Awaited<ReturnType<typeof getTopic>>
@@ -41,8 +43,18 @@ export default function ClientForm({ data }: ClientFormProps) {
   })
 
   async function handleSubmit(values: z.infer<typeof formSchema>) {
-    await upsertTopic(values, data)
-    router.push('/topic/list')
+    const [err, result] = await to<JsonBodyType<string>>(upsertTopic(values, data))
+    if (err) {
+      toastError(err.message)
+      return
+    }
+    const { status, message } = result
+    if (status === 0) {
+      toastOk('保存成功')
+      router.push('/topic/list')
+    } else {
+      toastError(message)
+    }
   }
   return (
     <Form {...form}>

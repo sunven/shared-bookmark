@@ -44,7 +44,7 @@ export default function ClientForm() {
     },
     undefined
   )
-  // console.log('ClientForm', isPending)
+
   return (
     <Form {...form}>
       <form action={action} className="space-y-8 mx-[25%]">
