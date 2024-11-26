@@ -8,46 +8,13 @@ datasource db {
   directUrl = env("DIRECT_URL") // uses a direct connection
 }
 
-model Software {
-  id          Int           @id @default(autoincrement())
-  name        String
-  description String?
-  website     String?
-  icon        String?
-  category    Category      @relation(fields: [categoryId], references: [id])
-  categoryId  Int
-  tags        SoftwareTag[]
-  createdAt   DateTime      @default(now())
-  updatedAt   DateTime      @updatedAt
-}
-
-model Category {
-  id       Int        @id @default(autoincrement())
-  name     String     @unique
-  software Software[]
-}
-
-model Tag {
-  id       Int           @id @default(autoincrement())
-  name     String        @unique
-  software SoftwareTag[]
-}
-
-model SoftwareTag {
-  software   Software @relation(fields: [softwareId], references: [id], onDelete: Cascade)
-  softwareId Int
-  tag        Tag      @relation(fields: [tagId], references: [id])
-  tagId      Int
-
-  @@id([softwareId, tagId])
-}
-
 model Topic {
-  id        String   @id @default(cuid())
-  name      String   @db.VarChar(128) @unique
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-  urls      Url[]
+  id          String   @id @default(cuid())
+  name        String   @unique @db.VarChar(128)
+  description String?  @db.VarChar(512)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  urls        Url[]
 }
 
 model Url {
