@@ -40,9 +40,7 @@ export default async function CardWithForm() {
             </div>
             <CardHeader>
               <CardTitle>
-                <Link href={'/topic/' + topic.id}>
-                  <Button variant="link">{topic.name}</Button>
-                </Link>
+                <Link href={'/topic/' + topic.id}>{topic.name}</Link>
               </CardTitle>
               <CardDescription>{topic.createdAt.toLocaleString()}</CardDescription>
             </CardHeader>
