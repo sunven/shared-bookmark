@@ -8,12 +8,6 @@ import { useTransition } from 'react'
 import { signInAction } from './actions'
 import { BuiltInProviderType } from '@auth/core/providers'
 import Image from 'next/image'
-import { Metadata } from 'next'
-
-export const metadata: Metadata = {
-  title: 'Login',
-  description: 'Login to your account',
-}
 
 export default function Login() {
   const [isPending, startTransition] = useTransition()
