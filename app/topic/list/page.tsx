@@ -4,15 +4,12 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { getTopicList } from '@/lib/db'
 import { Edit, Share2 } from 'lucide-react'
 import Link from 'next/link'
-
 import { DeleteTopicDialog } from './delete-topic-dialog'
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
-import { HoverCard, HoverCardContent, HoverCardTrigger } from '@/components/ui/hover-card'
-import { Metadata } from 'next'
+import './style.scss'
 
 export const dynamic = 'force-dynamic'
 
-export default async function CardWithForm() {
+export default async function TopicList() {
   const topics = await getTopicList()
   return (
     <div className="p-4">
@@ -45,32 +42,7 @@ export default async function CardWithForm() {
               <CardDescription>{topic.createdAt.toLocaleString()}</CardDescription>
             </CardHeader>
             <CardContent className="grid gap-1">
-              {topic.urls.map((item, index) => (
-                <HoverCard key={index}>
-                  <HoverCardTrigger asChild>
-                    <Button className="p-0 h-6 flex gap-2 overflow-hidden justify-start" variant="link">
-                      <Avatar className="w-5 h-5">
-                        <AvatarImage src={item.icon || ''} />
-                        <AvatarFallback>img</AvatarFallback>
-                      </Avatar>
-                      <Link target="_blank" href={item.url} className="truncate">
-                        {item.title}
-                      </Link>
-                    </Button>
-                  </HoverCardTrigger>
-                  <HoverCardContent className="w-80">
-                    <div className="flex justify-between space-x-4">
-                      <Avatar>
-                        <AvatarImage src={item.icon || ''} />
-                        <AvatarFallback>icon</AvatarFallback>
-                      </Avatar>
-                      <div className="space-y-1">
-                        <p className="text-sm">{item.description}</p>
-                      </div>
-                    </div>
-                  </HoverCardContent>
-                </HoverCard>
-              ))}
+              <div className="text-muted-foreground description">{topic.description}</div>
             </CardContent>
           </Card>
         ))}

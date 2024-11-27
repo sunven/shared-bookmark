@@ -13,5 +13,6 @@ export const formSchema = z.object({
   name: z.string().min(1, {
     message: '不能为空。',
   }),
+  description: z.string().optional(),
   urls: z.array(urlSchema).min(1, { message: '至少需要一个URL。' }),
 })

@@ -19,6 +19,7 @@ export async function upsertTopic(
     await updateTopic({
       id: data.id,
       name: values.name,
+      description: values.description,
       createMany: values.urls.filter(c => !c.id),
       updateMany: values.urls.filter(c => c.id && ids.includes(c.id)),
       deleteMany: originalIds.filter(c => !ids.includes(c)),

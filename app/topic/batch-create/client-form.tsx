@@ -63,6 +63,20 @@ export default function ClientForm() {
           )}
         />
         <FormField
+          name="description"
+          render={({ field }) => (
+            <FormItem>
+              <div className="flex items-center space-x-4">
+                <FormLabel className="flex-shrink-0 w-20">描述</FormLabel>
+                <FormControl>
+                  <Input {...field} />
+                </FormControl>
+              </div>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+        <FormField
           name="urls"
           render={({ field }) => (
             <FormItem>

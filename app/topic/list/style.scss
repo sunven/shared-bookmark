@@ -1,0 +1,10 @@
+.description {
+  display: -webkit-box;
+  overflow: hidden;
+  -webkit-box-orient: vertical;
+  line-clamp: 3;
+  -webkit-line-clamp: 3;
+  /* 以下  */
+  // width: 25em;
+  white-space: normal;
+}

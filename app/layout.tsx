@@ -32,11 +32,13 @@ export default async function RootLayout({
   return (
     <html lang="en">
       <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
-        <header className="fixed top-0 left-0 right-0 flex justify-between items-center bg-muted z-10">
+        <header className="fixed top-0 left-0 right-0 flex justify-between items-center bg-muted z-10 h-[70px]">
           <div>sb</div>
-          <SessionProvider session={session}>
-            <NavUser />
-          </SessionProvider>
+          {session && (
+            <SessionProvider session={session}>
+              <NavUser />
+            </SessionProvider>
+          )}
         </header>
         <main className="mt-20">
           <SWRProvider>{children}</SWRProvider>

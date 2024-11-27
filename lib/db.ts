@@ -33,21 +33,9 @@ export async function getTopicList() {
     select: {
       id: true,
       name: true,
+      description: true,
       createdAt: true,
       updatedAt: true,
-      urls: {
-        select: {
-          icon: true,
-          title: true,
-          description: true,
-          url: true,
-        },
-      },
-      _count: {
-        select: {
-          urls: true,
-        },
-      },
     },
   })
 }
@@ -60,6 +48,7 @@ export function getTopic(id: string) {
     select: {
       id: true,
       name: true,
+      description: true,
       createdAt: true,
       updatedAt: true,
       urls: {
@@ -75,10 +64,15 @@ export function getTopic(id: string) {
   })
 }
 
-export async function createTopic(data: { name: string; urls: Prisma.UrlCreateWithoutTopicInput[] }) {
+export async function createTopic(data: {
+  name: string
+  description?: string
+  urls: Prisma.UrlCreateWithoutTopicInput[]
+}) {
   return prisma.topic.create({
     data: {
       name: data.name,
+      description: data.description,
       urls: {
         create: data.urls,
       },
@@ -90,6 +84,7 @@ export async function createTopic(data: { name: string; urls: Prisma.UrlCreateWi
 export function updateTopic(data: {
   id: string
   name: string
+  description?: string
   createMany: Prisma.UrlCreateWithoutTopicInput[]
   updateMany: Prisma.UrlUncheckedUpdateWithoutTopicInput[]
   deleteMany: number[]
@@ -98,6 +93,7 @@ export function updateTopic(data: {
     where: { id: data.id },
     data: {
       name: data.name,
+      description: data.description,
       urls: {
         createMany: { data: data.createMany },
         updateMany: data.updateMany.map(({ id, ...rest }) => ({
