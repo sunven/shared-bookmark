@@ -24,6 +24,7 @@ export async function upsertTopic(state: unknown, formData: FormData): Promise<J
   const result = await resolveUrl<Prisma.UrlCreateWithoutTopicInput>(urlList)
   const { id } = await createTopic({
     name: validatedFields.data.name,
+    description: validatedFields.data.description,
     urls: result,
   })
   return okJsonBody(id)

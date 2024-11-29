@@ -7,6 +7,7 @@ export const formSchema = z.object({
       message: '不能为空。',
     })
     .trim(),
+  description: z.string().trim(),
   urls: z
     .string()
     .min(1, {

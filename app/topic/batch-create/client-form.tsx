@@ -69,7 +69,7 @@ export default function ClientForm() {
               <div className="flex items-center space-x-4">
                 <FormLabel className="flex-shrink-0 w-20">描述</FormLabel>
                 <FormControl>
-                  <Input {...field} />
+                  <Textarea rows={2} {...field} />
                 </FormControl>
               </div>
               <FormMessage />
