@@ -1,5 +1,9 @@
 # shared-bookmark
 
+收藏在各个地方
+
+- 聚合共享
+
 环境变量
 
 - <https://www.sammeechward.com/prisma-and-nextjs>
