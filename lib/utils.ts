@@ -66,6 +66,9 @@ export async function resolveUrl<T>(urlList: string[]) {
           const url = new URL(urlList[i])
           let title = ''
           if (url.hostname === 'github.com') {
+            // e.g.
+            // https://github.com/bytedance/IconPark
+            // https://github.com/bytedance/IconPark/blob/master/CHANGELOG.zh-CN.md
             title = url.pathname.split('/').slice(1, 3).join('/')
           } else {
             title = $('title').text() || ''
