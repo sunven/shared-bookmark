@@ -3,6 +3,7 @@ import { clsx, type ClassValue } from 'clsx'
 import { NextResponse } from 'next/server'
 import { twMerge } from 'tailwind-merge'
 import * as cheerio from 'cheerio'
+import to from 'await-to-js'
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs))
@@ -61,9 +62,14 @@ export async function resolveUrl<T>(urlList: string[]) {
         const result: T[] = []
         for (let i = 0; i < values.length; i++) {
           const response = values[i]
-          const html = await response.text()
-          const $ = cheerio.load(html)
           const url = urlList[i]
+          const [err, html] = await to(response.text())
+          if (err) {
+            result.push({ title: url, url } as T)
+            console.error(url, err)
+            break
+          }
+          const $ = cheerio.load(html)
           const icon = getUrl(getIconHref($), url)
           const description = $('meta[name="description"]').attr('content') || ''
           result.push({ title: getTitle($, url), url, icon, description } as T)

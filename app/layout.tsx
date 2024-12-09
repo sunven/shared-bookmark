@@ -31,7 +31,9 @@ export default async function RootLayout({
   const session = await auth()
   return (
     <html lang="en">
-      <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
+      {/* https://nextjs.org/docs/messages/react-hydration-error#solution-3-using-suppresshydrationwarning
+      monica extension error*/}
+      <body className={`${geistSans.variable} ${geistMono.variable} antialiased`} suppressHydrationWarning>
         <header className="fixed top-0 left-0 right-0 flex justify-between items-center bg-muted z-10 h-[70px]">
           <div>sb</div>
           {session && (
