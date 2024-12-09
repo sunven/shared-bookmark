@@ -63,24 +63,29 @@ export async function resolveUrl<T>(urlList: string[]) {
           const response = values[i]
           const html = await response.text()
           const $ = cheerio.load(html)
-          const url = new URL(urlList[i])
-          let title = ''
-          if (url.hostname === 'github.com') {
-            // e.g.
-            // https://github.com/bytedance/IconPark
-            // https://github.com/bytedance/IconPark/blob/master/CHANGELOG.zh-CN.md
-            title = url.pathname.split('/').slice(1, 3).join('/')
-          } else {
-            title = $('title').text() || ''
-          }
-          const icon = getUrl(getIconHref($), url.href)
+          const url = urlList[i]
+          const icon = getUrl(getIconHref($), url)
           const description = $('meta[name="description"]').attr('content') || ''
-          result.push({ title, url, icon, description } as T)
+          result.push({ title: getTitle($, url), url, icon, description } as T)
         }
         resolve(result)
       })
       .catch(reject)
   })
+}
+
+function getTitle($: cheerio.CheerioAPI, href: string) {
+  const url = new URL(href)
+  let title = ''
+  if (url.hostname === 'github.com') {
+    // e.g.
+    // https://github.com/bytedance/IconPark
+    // https://github.com/bytedance/IconPark/blob/master/CHANGELOG.zh-CN.md
+    title = url.pathname.split('/').slice(1, 3).join('/')
+  } else {
+    title = $('title').text() || ''
+  }
+  return title.substring(0, 128)
 }
 
 function getIconHref($: cheerio.CheerioAPI) {
