@@ -9,6 +9,7 @@
     "lint": "next lint",
     "prisma:format": "prisma format",
     "prisma:pull": "dotenv -e .env.local prisma db pull",
+    "prisma:push": "dotenv -e .env.local prisma db push",
     "prisma:migrate": "dotenv -e .env.local prisma migrate dev",
     "prisma:generate": "prisma generate"
   },
