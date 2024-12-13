@@ -93,8 +93,7 @@ export const testimonials: TestimonialType[] = [
     name: 'John Doe',
     job: 'Full Stack Developer',
     image: 'https://randomuser.me/api/portraits/men/1.jpg',
-    review:
-      "The next-saas-stripe-starter repo has truly revolutionized my development workflow. With its comprehensive features and seamless integration with Stripe, I've been able to build and deploy projects faster than ever before. The documentation is clear and concise, making it easy to navigate through the setup process. I highly recommend next-saas-stripe-starter to any developer.",
+    review: '',
   },
   {
     name: 'Alice Smith',

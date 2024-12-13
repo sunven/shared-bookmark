@@ -1,10 +1,11 @@
-import { testimonials } from '@/config/landing'
+import { getTopicList } from '@/lib/db'
 import Image from 'next/image'
 
-export default function TopicPage() {
+export default async function TopicPage() {
+  const topics = await getTopicList()
   return (
-    <div className="container column-1 gap-5 space-y-5 md:columns-2 lg:columns-3 ">
-      {testimonials.map(item => (
+    <div className="container max-w-6xl column-1 gap-5 space-y-5 md:columns-2 lg:columns-3 mt-10">
+      {topics.map(item => (
         <div className="break-inside-avoid" key={item.name}>
           <div className="relative rounded-xl border bg-muted/25">
             <div className="flex flex-col px-4 py-5 sm:p-6">
@@ -21,10 +22,10 @@ export default function TopicPage() {
                   </span>
                   <div>
                     <p className="text-sm font-semibold text-foreground">{item.name}</p>
-                    <p className="text-sm text-muted-foreground">{item.job}</p>
+                    <p className="text-sm text-muted-foreground">{item.createdAt.toLocaleString()}</p>
                   </div>
                 </div>
-                <q className="text-muted-foreground">{item.review}</q>
+                <q className="text-muted-foreground">{item.description}</q>
               </div>
             </div>
           </div>
