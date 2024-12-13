@@ -9,10 +9,26 @@ const nextConfig = {
     ignoreBuildErrors: true
   },
   reactStrictMode: false,
+  images: {
+    remotePatterns: [
+      {
+        protocol: "https",
+        hostname: "avatars.githubusercontent.com",
+      },
+      {
+        protocol: "https",
+        hostname: "lh3.googleusercontent.com",
+      },
+      {
+        protocol: "https",
+        hostname: "randomuser.me",
+      },
+    ],
+  },
 };
 
 if (process.env.NODE_ENV === 'development') {
-  await setupDevPlatform();
+  // await setupDevPlatform();
 }
 
 export default nextConfig;

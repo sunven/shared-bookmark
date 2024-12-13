@@ -6,6 +6,7 @@ import { SWRProvider } from './swr-provider'
 import { NavUser } from '@/components/nav-user'
 import { SessionProvider } from 'next-auth/react'
 import { auth } from '@/auth'
+import { ThemeProvider } from 'next-themes'
 
 const geistSans = localFont({
   src: './fonts/GeistVF.woff',
@@ -30,22 +31,24 @@ export default async function RootLayout({
 }>) {
   const session = await auth()
   return (
-    <html lang="en">
+    <html lang="en" suppressHydrationWarning>
       {/* https://nextjs.org/docs/messages/react-hydration-error#solution-3-using-suppresshydrationwarning
       monica extension error*/}
-      <body className={`${geistSans.variable} ${geistMono.variable} antialiased`} suppressHydrationWarning>
-        <header className="fixed top-0 left-0 right-0 flex justify-between items-center bg-muted z-10 h-[70px]">
+      <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
+        {/* <header className="fixed top-0 left-0 right-0 flex justify-between items-center bg-muted z-10 h-[70px]">
           <div>sb</div>
           {session && (
             <SessionProvider session={session}>
               <NavUser />
             </SessionProvider>
           )}
-        </header>
-        <main className="mt-20">
-          <SWRProvider>{children}</SWRProvider>
-        </main>
-        <Toaster />
+        </header> */}
+        <SessionProvider session={session}>
+          <ThemeProvider attribute="class" defaultTheme="system" enableSystem disableTransitionOnChange>
+            <SWRProvider>{children}</SWRProvider>
+            <Toaster />
+          </ThemeProvider>
+        </SessionProvider>
       </body>
     </html>
   )
