@@ -1,40 +1,29 @@
-"use client";
+'use client'
 
-import { useTransition } from "react";
-import { generateUserStripe } from "@/actions/generate-user-stripe";
-import { SubscriptionPlan, UserSubscriptionPlan } from "@/types";
+import { useTransition } from 'react'
+import { generateUserStripe } from '@/actions/generate-user-stripe'
+import { SubscriptionPlan, UserSubscriptionPlan } from '@/types'
 
-import { Button } from "@/components/ui/button";
-import { Icons } from "@/components/shared/icons";
+import { Button } from '@/components/ui/button'
+import { Icons } from '@/components/shared/icons'
 
 interface BillingFormButtonProps {
-  offer: SubscriptionPlan;
-  subscriptionPlan: UserSubscriptionPlan;
-  year: boolean;
+  offer: SubscriptionPlan
+  subscriptionPlan: UserSubscriptionPlan
+  year: boolean
 }
 
-export function BillingFormButton({
-  year,
-  offer,
-  subscriptionPlan,
-}: BillingFormButtonProps) {
-  let [isPending, startTransition] = useTransition();
-  const generateUserStripeSession = generateUserStripe.bind(
-    null,
-    offer.stripeIds[year ? "yearly" : "monthly"],
-  );
+export function BillingFormButton({ year, offer, subscriptionPlan }: BillingFormButtonProps) {
+  let [isPending, startTransition] = useTransition()
+  const generateUserStripeSession = generateUserStripe.bind(null, offer.stripeIds[year ? 'yearly' : 'monthly'])
 
-  const stripeSessionAction = () =>
-    startTransition(async () => await generateUserStripeSession());
+  const stripeSessionAction = () => startTransition(async () => await generateUserStripeSession())
 
-  const userOffer =
-    subscriptionPlan.stripePriceId ===
-    offer.stripeIds[year ? "yearly" : "monthly"];
+  const userOffer = subscriptionPlan.stripePriceId === offer.stripeIds[year ? 'yearly' : 'monthly']
 
   return (
     <Button
-      variant={userOffer ? "default" : "outline"}
-      rounded="full"
+      variant={userOffer ? 'default' : 'outline'}
       className="w-full"
       disabled={isPending}
       onClick={stripeSessionAction}
@@ -44,8 +33,8 @@ export function BillingFormButton({
           <Icons.spinner className="mr-2 size-4 animate-spin" /> Loading...
         </>
       ) : (
-        <>{userOffer ? "Manage Subscription" : "Upgrade"}</>
+        <>{userOffer ? 'Manage Subscription' : 'Upgrade'}</>
       )}
     </Button>
-  );
+  )
 }

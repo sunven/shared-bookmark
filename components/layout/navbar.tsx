@@ -17,6 +17,7 @@ import { Skeleton } from '@/components/ui/skeleton'
 import { Icons } from '@/components/shared/icons'
 import MaxWidthWrapper from '@/components/shared/max-width-wrapper'
 import { useWindowScroll } from 'react-use'
+import { ModeToggle } from './mode-toggle'
 
 interface NavBarProps {
   scroll?: boolean
@@ -89,7 +90,7 @@ export function NavBar({ scroll = false }: NavBarProps) {
 
           {session ? (
             <Link href={session.user.role === 'ADMIN' ? '/admin' : '/dashboard'} className="hidden md:block">
-              <Button className="gap-2 px-5" variant="default" size="sm" rounded="full">
+              <Button variant="default" size="sm">
                 <span>Dashboard</span>
               </Button>
             </Link>
@@ -98,7 +99,6 @@ export function NavBar({ scroll = false }: NavBarProps) {
               className="hidden gap-2 px-5 md:flex"
               variant="default"
               size="sm"
-              rounded="full"
               // onClick={() => setShowSignInModal(true)}
             >
               <span>Sign In</span>
@@ -107,6 +107,15 @@ export function NavBar({ scroll = false }: NavBarProps) {
           ) : (
             <Skeleton className="hidden h-9 w-28 rounded-full lg:flex" />
           )}
+          {/* <Link
+            href={siteConfig.links.github}
+            target="_blank"
+            rel="noreferrer"
+            className="font-medium underline underline-offset-4"
+          >
+            <Icons.gitHub className="size-5" />
+          </Link> */}
+          <ModeToggle />
         </div>
       </MaxWidthWrapper>
     </header>

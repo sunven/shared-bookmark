@@ -36,6 +36,21 @@ export async function getTopicList() {
       description: true,
       createdAt: true,
       updatedAt: true,
+      _count: {
+        select: {
+          urls: true,
+        },
+      },
+      // 添加 urls 查询
+      urls: {
+        take: 1, // 只取第一条
+        orderBy: {
+          createdAt: 'desc', // 按创建时间倒序
+        },
+        select: {
+          icon: true,
+        },
+      },
     },
   })
 }

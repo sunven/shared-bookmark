@@ -46,7 +46,7 @@ export const sidebarLinks: SidebarNavItem[] = [
         href: '#',
         icon: 'messages',
         title: 'Support',
-        authorizeOnly: UserRole.USER,
+        // authorizeOnly: UserRole.USER,
         disabled: true,
       },
     ],
