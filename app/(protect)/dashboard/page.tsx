@@ -1,23 +1,20 @@
-import { getCurrentUser } from "@/lib/session";
-import { constructMetadata } from "@/lib/utils";
-import { Button } from "@/components/ui/button";
-import { DashboardHeader } from "@/components/dashboard/header";
-import { EmptyPlaceholder } from "@/components/shared/empty-placeholder";
+import { getCurrentUser } from '@/lib/session'
+import { constructMetadata } from '@/lib/utils'
+import { Button } from '@/components/ui/button'
+import { DashboardHeader } from '@/components/dashboard/header'
+import { EmptyPlaceholder } from '@/components/shared/empty-placeholder'
 
-export const metadata = constructMetadata({
-  title: "Dashboard – SaaS Starter",
-  description: "Create and manage content.",
-});
+// export const metadata = constructMetadata({
+//   title: "Dashboard – SaaS Starter",
+//   description: "Create and manage content.",
+// });
 
 export default async function DashboardPage() {
-  const user = await getCurrentUser();
+  const user = await getCurrentUser()
 
   return (
     <>
-      <DashboardHeader
-        heading="Dashboard"
-        text={`Current Role : ${user?.role} — Change your role in settings.`}
-      />
+      <DashboardHeader heading="Dashboard" text={`Current Role : ${user?.role} — Change your role in settings.`} />
       <EmptyPlaceholder>
         <EmptyPlaceholder.Icon name="post" />
         <EmptyPlaceholder.Title>No content created</EmptyPlaceholder.Title>
@@ -27,5 +24,5 @@ export default async function DashboardPage() {
         <Button>Add Content</Button>
       </EmptyPlaceholder>
     </>
-  );
+  )
 }
