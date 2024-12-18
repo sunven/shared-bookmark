@@ -1,52 +1,40 @@
-import type { Metadata } from 'next'
-import localFont from 'next/font/local'
-import './globals.css'
-import { Toaster } from '@/components/ui/toaster'
-import { SWRProvider } from './swr-provider'
-import { NavUser } from '@/components/nav-user'
+import '@/styles/globals.css'
+
+import { fontGeist, fontHeading, fontSans, fontUrban } from '@/assets/fonts'
 import { SessionProvider } from 'next-auth/react'
-import { auth } from '@/auth'
 import { ThemeProvider } from 'next-themes'
 
-const geistSans = localFont({
-  src: './fonts/GeistVF.woff',
-  variable: '--font-geist-sans',
-  weight: '100 900',
-})
-const geistMono = localFont({
-  src: './fonts/GeistMonoVF.woff',
-  variable: '--font-geist-mono',
-  weight: '100 900',
-})
+import { cn, constructMetadata } from '@/lib/utils'
+import { Toaster } from '@/components/ui/sonner'
+import { Analytics } from '@/components/analytics'
+import ModalProvider from '@/components/modals/providers'
+import { TailwindIndicator } from '@/components/tailwind-indicator'
 
-export const metadata: Metadata = {
-  title: 'shared-bookmark',
-  description: 'shared-bookmark',
+interface RootLayoutProps {
+  children: React.ReactNode
 }
 
-export default async function RootLayout({
-  children,
-}: Readonly<{
-  children: React.ReactNode
-}>) {
-  const session = await auth()
+export const metadata = constructMetadata()
+
+export default function RootLayout({ children }: RootLayoutProps) {
   return (
     <html lang="en" suppressHydrationWarning>
-      {/* https://nextjs.org/docs/messages/react-hydration-error#solution-3-using-suppresshydrationwarning
-      monica extension error*/}
-      <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
-        {/* <header className="fixed top-0 left-0 right-0 flex justify-between items-center bg-muted z-10 h-[70px]">
-          <div>sb</div>
-          {session && (
-            <SessionProvider session={session}>
-              <NavUser />
-            </SessionProvider>
-          )}
-        </header> */}
-        <SessionProvider session={session}>
+      <head />
+      <body
+        className={cn(
+          'min-h-screen bg-background font-sans antialiased',
+          fontSans.variable,
+          fontUrban.variable,
+          fontHeading.variable,
+          fontGeist.variable
+        )}
+      >
+        <SessionProvider>
           <ThemeProvider attribute="class" defaultTheme="system" enableSystem disableTransitionOnChange>
-            <SWRProvider>{children}</SWRProvider>
-            <Toaster />
+            <ModalProvider>{children}</ModalProvider>
+            <Analytics />
+            <Toaster richColors closeButton />
+            <TailwindIndicator />
           </ThemeProvider>
         </SessionProvider>
       </body>
