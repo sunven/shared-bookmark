@@ -3,11 +3,12 @@ import { PrismaAdapter } from '@auth/prisma-adapter'
 import Google from 'next-auth/providers/google'
 import prisma from './lib/prisma'
 import { getUserById } from './lib/user'
+import GitHub from 'next-auth/providers/github'
 
 export const { handlers, signIn, signOut, auth } = NextAuth({
   adapter: PrismaAdapter(prisma),
   session: { strategy: 'jwt' },
-  providers: [Google],
+  providers: [Google, GitHub],
   callbacks: {
     // authorized 回调用于验证请求是否有权通过 Next.js Middleware 访问页面。
     // 它在请求完成之前调用，并接收具有 auth 和 request 属性的对象。
@@ -20,6 +21,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
       return !!auth
     },
     async session({ token, session }) {
+      // token 来自 jwt 回调
       // console.log('session', session, token)
       if (session.user) {
         if (token.sub) {
@@ -42,6 +44,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
     },
 
     async jwt({ token }) {
+      // session 模式, 会有 user
       // console.log('jwt', token)
       if (!token.sub) return token
 
