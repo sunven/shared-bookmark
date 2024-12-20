@@ -31,14 +31,18 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 import useSWR from 'swr'
 import { http } from '@/lib/http'
 
-export type Payment = {
+export type Topic = {
   id: string
-  amount: number
-  status: 'pending' | 'processing' | 'success' | 'failed'
-  email: string
+  name: string
+  description: string
+  createdAt: Date
+  updatedAt: Date
+  _count: {
+    urls: number
+  }
 }
 
-export const columns: ColumnDef<Payment>[] = [
+export const columns: ColumnDef<Topic>[] = [
   {
     id: 'select',
     header: ({ table }) => (
@@ -65,6 +69,7 @@ export const columns: ColumnDef<Payment>[] = [
   },
   {
     accessorKey: 'description',
+    // maxSize: 200,
     header: ({ column }) => {
       return (
         <Button variant="ghost" onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}>
@@ -83,11 +88,15 @@ export const columns: ColumnDef<Payment>[] = [
   {
     accessorKey: 'updatedAt',
     header: 'UpdatedAt',
-    cell: ({ row }) => <div className="capitalize">{row.getValue('updatedAt')}</div>,
+    cell: ({ row }) => (
+      <div suppressHydrationWarning className="capitalize">
+        {row.original.updatedAt.toDateString()}
+      </div>
+    ),
   },
   {
     accessorKey: '_count',
-    header: () => <div className="text-right">Amount</div>,
+    header: () => <div className="text-right">url count</div>,
     cell: ({ row }) => {
       return <div className="text-right font-medium">{row.original._count.urls}</div>
     },

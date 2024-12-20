@@ -31,6 +31,7 @@ export function UserAuthForm({ className, type, ...props }: UserAuthFormProps) {
   })
   const [isLoading, setIsLoading] = React.useState<boolean>(false)
   const [isGoogleLoading, setIsGoogleLoading] = React.useState<boolean>(false)
+  const [isGitHubLoading, setIsGitHubLoading] = React.useState<boolean>(false)
   const searchParams = useSearchParams()
 
   async function onSubmit(data: FormData) {
@@ -70,7 +71,7 @@ export function UserAuthForm({ className, type, ...props }: UserAuthFormProps) {
               autoCapitalize="none"
               autoComplete="email"
               autoCorrect="off"
-              disabled={isLoading || isGoogleLoading}
+              disabled={isLoading || isGoogleLoading || isGitHubLoading}
               {...register('email')}
             />
             {errors?.email && <p className="px-1 text-xs text-red-600">{errors.email.message}</p>}
@@ -109,12 +110,12 @@ export function UserAuthForm({ className, type, ...props }: UserAuthFormProps) {
         type="button"
         className={cn(buttonVariants({ variant: 'outline' }))}
         onClick={() => {
-          setIsGoogleLoading(true)
-          signIn('google')
+          setIsGitHubLoading(true)
+          signIn('github')
         }}
-        disabled={isLoading || isGoogleLoading}
+        disabled={isLoading || isGitHubLoading}
       >
-        {isGoogleLoading ? (
+        {isGitHubLoading ? (
           <Icons.spinner className="mr-2 size-4 animate-spin" />
         ) : (
           <Icons.gitHub className="mr-2 size-4" />
