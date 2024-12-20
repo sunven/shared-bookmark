@@ -23,3 +23,7 @@ vercel env pull
 ```
 
 <https://github.com/mickasmt/next-saas-stripe-starter>
+
+auth prisma
+
+- session 必须使用 jwt

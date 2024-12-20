@@ -9,7 +9,7 @@ export default auth(req => {
     return
   }
   if (req.nextUrl.pathname.startsWith('/api')) {
-    if (req.nextUrl.pathname.startsWith('/api/auth/callback') || req.nextUrl.pathname.startsWith('/api/auth/error')) {
+    if (req.nextUrl.pathname.startsWith('/api/auth')) {
       return
     }
     return errorResponse('not authenticated', 401)
