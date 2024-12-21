@@ -64,12 +64,16 @@ export const columns: ColumnDef<Topic>[] = [
   },
   {
     accessorKey: 'name',
+    maxSize: 300,
     header: 'Name',
-    cell: ({ row }) => <div className="capitalize">{row.getValue('name')}</div>,
+    cell: ({ row, cell }) => (
+      <div style={{ width: cell.column.getSize() }} className="capitalize w-[120px]">
+        {row.getValue('name')}
+      </div>
+    ),
   },
   {
     accessorKey: 'description',
-    // maxSize: 200,
     header: ({ column }) => {
       return (
         <Button variant="ghost" onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}>
@@ -78,27 +82,23 @@ export const columns: ColumnDef<Topic>[] = [
         </Button>
       )
     },
-    cell: ({ row }) => <div className="lowercase">{row.getValue('description')}</div>,
+    cell: ({ row }) => <div className="">{row.getValue('description')}</div>,
   },
   {
     accessorKey: 'createdAt',
     header: 'CreatedAt',
-    cell: ({ row }) => <div className="capitalize">{row.getValue('createdAt')}</div>,
+    cell: ({ row }) => <div className="w-[160px]">{new Date(row.original.createdAt).toLocaleString()}</div>,
   },
   {
     accessorKey: 'updatedAt',
     header: 'UpdatedAt',
-    cell: ({ row }) => (
-      <div suppressHydrationWarning className="capitalize">
-        {row.original.updatedAt.toDateString()}
-      </div>
-    ),
+    cell: ({ row }) => <div className="w-[200px]">{new Date(row.original.updatedAt).toLocaleString()}</div>,
   },
   {
     accessorKey: '_count',
-    header: () => <div className="text-right">url count</div>,
+    header: 'url count',
     cell: ({ row }) => {
-      return <div className="text-right font-medium">{row.original._count.urls}</div>
+      return <div className="text-center w-[80px]">{row.original._count.urls}</div>
     },
   },
   {
@@ -123,7 +123,6 @@ export default function DataTableDemo() {
   const [columnVisibility, setColumnVisibility] = React.useState<VisibilityState>({})
   const [rowSelection, setRowSelection] = React.useState({})
   const { data = [], isLoading, error } = useSWR('/api/topic', http.get)
-  // console.log(data, isLoading, error)
   const table = useReactTable({
     data,
     columns,
