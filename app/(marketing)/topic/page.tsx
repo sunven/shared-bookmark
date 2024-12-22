@@ -1,5 +1,6 @@
 import prisma from '@/lib/prisma'
 import Link from 'next/link'
+import Image from 'next/image'
 
 function getTopicList() {
   return prisma.topic.findMany({
@@ -25,6 +26,13 @@ function getTopicList() {
   })
 }
 
+function getIcon(icon: string | undefined | null) {
+  if (icon && icon.startsWith('http')) {
+    return icon
+  }
+  return ''
+}
+
 export default async function TopicPage() {
   const topics = await getTopicList()
   return (
@@ -36,17 +44,11 @@ export default async function TopicPage() {
               <div>
                 <div className="relative mb-4 flex items-center gap-3">
                   <span className="relative inline-flex size-10 shrink-0 items-center justify-center rounded-full text-base">
-                    <img
-                      width={100}
-                      height={100}
-                      className="size-full"
-                      src={item.urls[0]?.icon || ''}
-                      alt={item.name}
-                    />
+                    <Image width={100} height={100} src={getIcon(item.urls[0]?.icon)} alt={item.name} />
                   </span>
                   <div>
                     <p className="text-sm font-semibold text-foreground">
-                      <Link href={`/topic1/${item.id}`} target="_blank">
+                      <Link href={`/topic/${item.id}`} target="_blank">
                         {item.name}
                       </Link>
                     </p>
