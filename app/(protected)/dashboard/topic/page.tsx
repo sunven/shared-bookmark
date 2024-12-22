@@ -1,6 +1,6 @@
 'use client'
 
-import * as React from 'react'
+import React, { useState } from 'react'
 import {
   ColumnDef,
   ColumnFiltersState,
@@ -9,11 +9,10 @@ import {
   flexRender,
   getCoreRowModel,
   getFilteredRowModel,
-  getPaginationRowModel,
   getSortedRowModel,
   useReactTable,
 } from '@tanstack/react-table'
-import { ArrowUpDown, ChevronDown, Edit, MoreHorizontal, Trash2 } from 'lucide-react'
+import { ChevronDown, Edit, Eye } from 'lucide-react'
 
 import { Button } from '@/components/ui/button'
 import { Checkbox } from '@/components/ui/checkbox'
@@ -21,17 +20,17 @@ import {
   DropdownMenu,
   DropdownMenuCheckboxItem,
   DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
 import { Input } from '@/components/ui/input'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
 import useSWR from 'swr'
 import { http } from '@/lib/http'
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip'
+import Link from 'next/link'
+import { DeleteTopicDialog } from './delete-topic-dialog'
 
-export type Topic = {
+type Topic = {
   id: string
   name: string
   description: string
@@ -64,53 +63,57 @@ export const columns: ColumnDef<Topic>[] = [
   },
   {
     accessorKey: 'name',
-    maxSize: 300,
     header: 'Name',
-    cell: ({ row, cell }) => (
-      <div style={{ width: cell.column.getSize() }} className="capitalize w-[120px]">
-        {row.getValue('name')}
-      </div>
-    ),
   },
   {
     accessorKey: 'description',
-    header: ({ column }) => {
+    header: 'Description',
+    cell: ({ row }) => {
+      const maxLength = 40
+      if (!row.original.description || row.original.description?.length <= maxLength) {
+        return row.original.description
+      }
       return (
-        <Button variant="ghost" onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}>
-          Description
-          <ArrowUpDown />
-        </Button>
+        <TooltipProvider>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <p>{row.original.description?.substring(0, 40)}...</p>
+            </TooltipTrigger>
+            <TooltipContent>
+              <p className="w-80">{row.original.description}</p>
+            </TooltipContent>
+          </Tooltip>
+        </TooltipProvider>
       )
     },
-    cell: ({ row }) => <div className="">{row.getValue('description')}</div>,
   },
   {
     accessorKey: 'createdAt',
     header: 'CreatedAt',
-    cell: ({ row }) => <div className="w-[160px]">{new Date(row.original.createdAt).toLocaleString()}</div>,
+    cell: ({ row }) => new Date(row.original.createdAt).toLocaleString(),
   },
   {
     accessorKey: 'updatedAt',
     header: 'UpdatedAt',
-    cell: ({ row }) => <div className="w-[200px]">{new Date(row.original.updatedAt).toLocaleString()}</div>,
+    cell: ({ row }) => new Date(row.original.updatedAt).toLocaleString(),
   },
   {
-    accessorKey: '_count',
+    accessorKey: '_count.urls',
     header: 'url count',
-    cell: ({ row }) => {
-      return <div className="text-center w-[80px]">{row.original._count.urls}</div>
-    },
   },
   {
     id: 'actions',
     enableHiding: false,
     cell: ({ row }) => {
-      const payment = row.original
-
       return (
         <div className="flex gap-2">
-          <Edit className="h-4 w-4 cursor-pointer" />
-          <Trash2 className="h-4 w-4 cursor-pointer"></Trash2>
+          <Link className="text-blue-500" href={`/dashboard/topics/${row.original.id}`}>
+            <Eye className="h-4 w-4 cursor-pointer" />
+          </Link>
+          <Link className="text-blue-500" href={`/dashboard/topics/edit/${row.original.id}`}>
+            <Edit className="h-4 w-4 cursor-pointer" />
+          </Link>
+          <DeleteTopicDialog topicId={row.original.id} onSuccess={() => {}} />
         </div>
       )
     },
@@ -118,39 +121,53 @@ export const columns: ColumnDef<Topic>[] = [
 ]
 
 export default function DataTableDemo() {
-  const [sorting, setSorting] = React.useState<SortingState>([])
-  const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>([])
-  const [columnVisibility, setColumnVisibility] = React.useState<VisibilityState>({})
+  const [sorting, setSorting] = useState<SortingState>([])
+  const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([])
+  const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({})
   const [rowSelection, setRowSelection] = React.useState({})
-  const { data = [], isLoading, error } = useSWR('/api/topic', http.get)
+  const [pagination, setPagination] = useState({
+    pageIndex: 0, //initial page index
+    pageSize: 10, //default page size
+  })
+  const { data, isLoading, error } = useSWR<{ count: number; rows: Topic[] }>(['/api/topic', pagination], http.get)
+  console.log('data', pagination, data)
+
+  const defaultData = React.useMemo(() => [], [])
   const table = useReactTable({
-    data,
+    data: data?.rows || defaultData,
+    rowCount: data?.count,
     columns,
     onSortingChange: setSorting,
     onColumnFiltersChange: setColumnFilters,
     getCoreRowModel: getCoreRowModel(),
-    getPaginationRowModel: getPaginationRowModel(),
+    manualPagination: true,
     getSortedRowModel: getSortedRowModel(),
     getFilteredRowModel: getFilteredRowModel(),
     onColumnVisibilityChange: setColumnVisibility,
     onRowSelectionChange: setRowSelection,
+    onPaginationChange: setPagination,
     state: {
       sorting,
       columnFilters,
       columnVisibility,
       rowSelection,
+      pagination,
     },
   })
 
   return (
     <div className="w-full">
-      <div className="flex items-center py-4">
+      <div className="flex gap-2 items-center py-4">
         <Input
           placeholder="Filter emails..."
           value={(table.getColumn('name')?.getFilterValue() as string) ?? ''}
           onChange={event => table.getColumn('name')?.setFilterValue(event.target.value)}
           className="max-w-sm"
         />
+        <Button>
+          <Link href="/dashboard/topics/new">Add Topic</Link>
+        </Button>
+        <Button variant="destructive">Delete</Button>
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <Button variant="outline" className="ml-auto">

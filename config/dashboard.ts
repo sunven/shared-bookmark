@@ -35,7 +35,7 @@ export const sidebarLinks: SidebarNavItem[] = [
       //   disabled: true,
       // },
       {
-        href: '/dashboard/topics',
+        href: '/dashboard/topic',
         icon: 'post',
         title: 'Topics',
         authorizeOnly: UserRole.USER,

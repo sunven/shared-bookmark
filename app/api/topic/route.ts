@@ -1,25 +1,34 @@
 import prisma from '@/lib/prisma'
 import { errorResponse, okResponse } from '@/lib/utils'
+import to from 'await-to-js'
 
-export async function GET(_: Request) {
-  const topics = await prisma.topic
-    .findMany({
-      select: {
-        id: true,
-        name: true,
-        description: true,
-        createdAt: true,
-        updatedAt: true,
-        _count: {
-          select: {
-            urls: true,
-          },
+export async function GET(req: Request) {
+  const { searchParams } = new URL(req.url)
+  const pageIndex = searchParams.get('pageIndex')
+  const pageSize = searchParams.get('pageSize')
+  const countPromise = prisma.topic.count({})
+  const topicPromise = prisma.topic.findMany({
+    skip: Number(pageIndex) * Number(pageSize),
+    take: Number(pageSize),
+    orderBy: {
+      updatedAt: 'desc',
+    },
+    select: {
+      id: true,
+      name: true,
+      description: true,
+      createdAt: true,
+      updatedAt: true,
+      _count: {
+        select: {
+          urls: true,
         },
       },
-    })
-    .catch(error => {
-      console.error(error)
-      return errorResponse('Failed to get topics')
-    })
-  return okResponse(topics)
+    },
+  })
+
+  const [error, result] = await to<[number, Awaited<typeof topicPromise>]>(Promise.all([countPromise, topicPromise]))
+  if (error || !result) return errorResponse('Failed to get topics')
+  const [count, rows] = result
+  return okResponse({ count, rows })
 }
