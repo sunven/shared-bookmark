@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useState } from 'react'
+import React, { useMemo, useState } from 'react'
 import {
   ColumnDef,
   ColumnFiltersState,
@@ -12,7 +12,7 @@ import {
   getSortedRowModel,
   useReactTable,
 } from '@tanstack/react-table'
-import { ChevronDown, Edit, Eye } from 'lucide-react'
+import { ChevronDown, Edit, Eye, Plus, Trash2 } from 'lucide-react'
 
 import { Button } from '@/components/ui/button'
 import { Checkbox } from '@/components/ui/checkbox'
@@ -28,7 +28,9 @@ import useSWR from 'swr'
 import { http } from '@/lib/http'
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip'
 import Link from 'next/link'
-import { DeleteTopicDialog } from './delete-topic-dialog'
+import { DeleteDialog } from '@/components/delete-dialog'
+import { toast } from 'sonner'
+import { isEmpty } from 'lodash-es'
 
 type Topic = {
   id: string
@@ -41,99 +43,117 @@ type Topic = {
   }
 }
 
-export const columns: ColumnDef<Topic>[] = [
-  {
-    id: 'select',
-    header: ({ table }) => (
-      <Checkbox
-        checked={table.getIsAllPageRowsSelected() || (table.getIsSomePageRowsSelected() && 'indeterminate')}
-        onCheckedChange={value => table.toggleAllPageRowsSelected(!!value)}
-        aria-label="Select all"
-      />
-    ),
-    cell: ({ row }) => (
-      <Checkbox
-        checked={row.getIsSelected()}
-        onCheckedChange={value => row.toggleSelected(!!value)}
-        aria-label="Select row"
-      />
-    ),
-    enableSorting: false,
-    enableHiding: false,
-  },
-  {
-    accessorKey: 'name',
-    header: 'Name',
-  },
-  {
-    accessorKey: 'description',
-    header: 'Description',
-    cell: ({ row }) => {
-      const maxLength = 40
-      if (!row.original.description || row.original.description?.length <= maxLength) {
-        return row.original.description
-      }
-      return (
-        <TooltipProvider>
-          <Tooltip>
-            <TooltipTrigger asChild>
-              <p>{row.original.description?.substring(0, 40)}...</p>
-            </TooltipTrigger>
-            <TooltipContent>
-              <p className="w-80">{row.original.description}</p>
-            </TooltipContent>
-          </Tooltip>
-        </TooltipProvider>
-      )
-    },
-  },
-  {
-    accessorKey: 'createdAt',
-    header: 'CreatedAt',
-    cell: ({ row }) => new Date(row.original.createdAt).toLocaleString(),
-  },
-  {
-    accessorKey: 'updatedAt',
-    header: 'UpdatedAt',
-    cell: ({ row }) => new Date(row.original.updatedAt).toLocaleString(),
-  },
-  {
-    accessorKey: '_count.urls',
-    header: 'url count',
-  },
-  {
-    id: 'actions',
-    enableHiding: false,
-    cell: ({ row }) => {
-      return (
-        <div className="flex gap-2">
-          <Link className="text-blue-500" href={`/dashboard/topics/${row.original.id}`}>
-            <Eye className="h-4 w-4 cursor-pointer" />
-          </Link>
-          <Link className="text-blue-500" href={`/dashboard/topics/edit/${row.original.id}`}>
-            <Edit className="h-4 w-4 cursor-pointer" />
-          </Link>
-          <DeleteTopicDialog topicId={row.original.id} onSuccess={() => {}} />
-        </div>
-      )
-    },
-  },
-]
-
 export default function DataTableDemo() {
   const [sorting, setSorting] = useState<SortingState>([])
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([])
   const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({})
   const [rowSelection, setRowSelection] = React.useState({})
+  const selectedIds = useMemo(() => {
+    return Object.entries(rowSelection)
+      .filter(([_, value]) => value)
+      .map(([key]) => key)
+  }, [rowSelection])
   const [pagination, setPagination] = useState({
     pageIndex: 0, //initial page index
     pageSize: 10, //default page size
   })
-  const { data, isLoading, error } = useSWR<{ count: number; rows: Topic[] }>(['/api/topic', pagination], http.get)
-  console.log('data', pagination, data)
+  const { data, isLoading, error, mutate } = useSWR<{ count: number; rows: Topic[] }>(
+    ['/api/topic', pagination],
+    http.get
+  )
+  const columns: ColumnDef<Topic>[] = useMemo(
+    () => [
+      {
+        id: 'select',
+        header: ({ table }) => (
+          <Checkbox
+            checked={table.getIsAllPageRowsSelected() || (table.getIsSomePageRowsSelected() && 'indeterminate')}
+            onCheckedChange={value => table.toggleAllPageRowsSelected(!!value)}
+            aria-label="Select all"
+          />
+        ),
+        cell: ({ row }) => (
+          <Checkbox
+            checked={row.getIsSelected()}
+            onCheckedChange={value => row.toggleSelected(!!value)}
+            aria-label="Select row"
+          />
+        ),
+        enableSorting: false,
+        enableHiding: false,
+      },
+      {
+        accessorKey: 'name',
+        header: 'Name',
+      },
+      {
+        accessorKey: 'description',
+        header: 'Description',
+        cell: ({ row }) => {
+          const maxLength = 40
+          if (!row.original.description || row.original.description?.length <= maxLength) {
+            return row.original.description
+          }
+          return (
+            <TooltipProvider>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <p>{row.original.description?.substring(0, 40)}...</p>
+                </TooltipTrigger>
+                <TooltipContent>
+                  <p className="w-80">{row.original.description}</p>
+                </TooltipContent>
+              </Tooltip>
+            </TooltipProvider>
+          )
+        },
+      },
+      {
+        accessorKey: 'createdAt',
+        header: 'CreatedAt',
+        cell: ({ row }) => new Date(row.original.createdAt).toLocaleString(),
+      },
+      {
+        accessorKey: 'updatedAt',
+        header: 'UpdatedAt',
+        cell: ({ row }) => new Date(row.original.updatedAt).toLocaleString(),
+      },
+      {
+        accessorKey: '_count.urls',
+        header: 'url count',
+      },
+      {
+        id: 'actions',
+        enableHiding: false,
+        cell: ({ row }) => {
+          return (
+            <div className="flex gap-2">
+              <Link className="text-blue-500" href={`/dashboard/topic/${row.original.id}`}>
+                <Eye className="h-4 w-4 cursor-pointer" />
+              </Link>
+              <Link className="text-blue-500" href={`/dashboard/topic/edit/${row.original.id}`}>
+                <Edit className="h-4 w-4 cursor-pointer" />
+              </Link>
+              <DeleteDialog
+                className="h-4 w-4"
+                onDelete={() => {
+                  http.delete(`/api/topic/${row.original.id}`).then(() => {
+                    toast.success('删除成功')
+                    mutate()
+                  })
+                }}
+              />
+            </div>
+          )
+        },
+      },
+    ],
+    [mutate]
+  )
 
   const defaultData = React.useMemo(() => [], [])
   const table = useReactTable({
+    getRowId: row => row.id,
     data: data?.rows || defaultData,
     rowCount: data?.count,
     columns,
@@ -164,10 +184,26 @@ export default function DataTableDemo() {
           onChange={event => table.getColumn('name')?.setFilterValue(event.target.value)}
           className="max-w-sm"
         />
-        <Button>
-          <Link href="/dashboard/topics/new">Add Topic</Link>
-        </Button>
-        <Button variant="destructive">Delete</Button>
+        <Link href="/dashboard/topic/new">
+          <Button type="button" variant="outline">
+            <Plus />
+            Add
+          </Button>
+        </Link>
+        {!isEmpty(selectedIds) && (
+          <DeleteDialog
+            onDelete={() => {
+              http.delete('/api/topic', { ids: selectedIds }).then(() => {
+                toast.success('删除成功')
+              })
+            }}
+          >
+            <Button variant="destructive">
+              <Trash2 />
+              Delete
+            </Button>
+          </DeleteDialog>
+        )}
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <Button variant="outline" className="ml-auto">

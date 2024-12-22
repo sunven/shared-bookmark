@@ -11,15 +11,24 @@ import { upsertTopic } from './actions'
 import { http } from '@/lib/http'
 import { useRouter } from 'next/navigation'
 import { getTopic } from '@/lib/db'
-import { JsonBodyType, toastError, toastOk } from '@/lib/utils'
+import { JsonBodyType } from '@/lib/utils'
 import to from 'await-to-js'
 import { Textarea } from '@/components/ui/textarea'
+import { toast } from 'sonner'
+import { TagsInput } from '@/components/tags-input'
 
 export interface ClientFormProps {
   data?: Awaited<ReturnType<typeof getTopic>>
 }
 
+const defaultUrl = {
+  title: '',
+  url: '',
+  tags: [],
+}
+
 export default function ClientForm({ data }: ClientFormProps) {
+  console.log('data', data)
   const router = useRouter()
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -29,12 +38,13 @@ export default function ClientForm({ data }: ClientFormProps) {
           description: data.description || undefined,
           urls: data.urls.map(url => ({
             ...url,
+            url: url.url || undefined,
             icon: url.icon || undefined,
             description: url.description || undefined,
           })),
         }
       : {
-          urls: [{ title: '', url: '' }],
+          urls: [{ ...defaultUrl }],
         },
   })
 
@@ -47,15 +57,15 @@ export default function ClientForm({ data }: ClientFormProps) {
   async function handleSubmit(values: z.infer<typeof formSchema>) {
     const [err, result] = await to<JsonBodyType<string>>(upsertTopic(values, data))
     if (err) {
-      toastError(err.message)
+      toast.error(err.message)
       return
     }
     const { status, message } = result
     if (status === 0) {
-      toastOk('保存成功')
-      router.push('/topic/list')
+      toast.success('保存成功')
+      router.back()
     } else {
-      toastError(message)
+      toast.error(message)
     }
   }
   return (
@@ -144,6 +154,27 @@ export default function ClientForm({ data }: ClientFormProps) {
                 )}
               />
               <FormField
+                name={`urls.${index}.tags`}
+                render={({ field }) => (
+                  <FormItem>
+                    <div className="flex items-center space-x-4">
+                      <FormLabel className="flex-shrink-0 w-20">tag</FormLabel>
+                      <FormControl>
+                        <TagsInput
+                          // {...field}
+                          className="w-full"
+                          value={field.value}
+                          onValueChange={v => {
+                            field.onChange(v)
+                          }}
+                        />
+                      </FormControl>
+                    </div>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
                 name={`urls.${index}.title`}
                 render={({ field }) => (
                   <FormItem>
@@ -189,7 +220,7 @@ export default function ClientForm({ data }: ClientFormProps) {
           ))}
         </div>
         <div className="flex justify-between pb-4">
-          <Button type="button" variant="outline" onClick={() => append({ title: '', url: '' })}>
+          <Button type="button" variant="outline" onClick={() => append({ ...defaultUrl })}>
             <PlusCircle className="h-4 w-4 mr-2" />
             添加网址
           </Button>

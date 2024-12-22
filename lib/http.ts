@@ -1,4 +1,4 @@
-import { toastError } from './utils'
+import { toast } from 'sonner'
 
 // 定义接口和类型
 interface Config {
@@ -66,7 +66,7 @@ class HttpClient {
 
       const { message, data } = await response.json()
       if (!response.ok) {
-        toastError(message)
+        toast.error(message)
         return Promise.reject(message)
       }
 
@@ -76,11 +76,11 @@ class HttpClient {
     }
   }
 
-  get<T>(url: string, params?: Record<string, string | number>, config?: Partial<RequestConfig>): Promise<T>
-  get<T>(args: [string, Record<string, string | number>?, Partial<RequestConfig>?]): Promise<T>
+  get<T>(url: string, params?: Record<string, unknown>, config?: Partial<RequestConfig>): Promise<T>
+  get<T>(args: [string, Record<string, unknown>?, Partial<RequestConfig>?]): Promise<T>
   get<T>(
-    urlOrArgs: string | [string, Record<string, string | number>?, Partial<RequestConfig>?],
-    params?: Record<string, string | number>,
+    urlOrArgs: string | [string, Record<string, unknown>?, Partial<RequestConfig>?],
+    params?: Record<string, unknown>,
     config?: Partial<RequestConfig>
   ): Promise<T> {
     if (Array.isArray(urlOrArgs)) {
@@ -115,11 +115,11 @@ class HttpClient {
     return http.request<T>('PUT', urlOrArgs, data, config)
   }
 
-  delete<T>(url: string, params?: Record<string, string | number>, config?: Partial<RequestConfig>): Promise<T>
-  delete<T>(args: [string, Record<string, string | number>?, Partial<RequestConfig>?]): Promise<T>
+  delete<T>(url: string, params?: Record<string, unknown>, config?: Partial<RequestConfig>): Promise<T>
+  delete<T>(args: [string, Record<string, unknown>?, Partial<RequestConfig>?]): Promise<T>
   delete<T>(
-    urlOrArgs: string | [string, Record<string, string | number>?, Partial<RequestConfig>?],
-    params?: Record<string, string | number>,
+    urlOrArgs: string | [string, Record<string, unknown>?, Partial<RequestConfig>?],
+    params?: Record<string, unknown>,
     config?: Partial<RequestConfig>
   ): Promise<T> {
     if (Array.isArray(urlOrArgs)) {
@@ -128,66 +128,6 @@ class HttpClient {
     return http.request<T>('DELETE', urlOrArgs, params, config)
   }
 }
-
-// export function get<T>(
-//   url: string,
-//   params?: Record<string, string | number>,
-//   config?: Partial<RequestConfig>
-// ): Promise<T>
-// export function get<T>(args: [string, Record<string, string | number>?, Partial<RequestConfig>?]): Promise<T>
-// export function get<T>(
-//   urlOrArgs: string | [string, Record<string, string | number>?, Partial<RequestConfig>?],
-//   params?: Record<string, string | number>,
-//   config?: Partial<RequestConfig>
-// ): Promise<T> {
-//   if (Array.isArray(urlOrArgs)) {
-//     return http.request<T>('GET', ...urlOrArgs)
-//   }
-//   return http.request<T>('GET', urlOrArgs, params, config)
-// }
-
-// export function post<T>(url: string, data?: unknown, config?: Partial<RequestConfig>): Promise<T>
-// export function post<T>(args: [string, unknown?, Partial<RequestConfig>?]): Promise<T>
-// export function post<T>(
-//   urlOrArgs: string | [string, unknown?, Partial<RequestConfig>?],
-//   data?: unknown,
-//   config?: Partial<RequestConfig>
-// ): Promise<T> {
-//   if (Array.isArray(urlOrArgs)) {
-//     return http.request<T>('POST', ...urlOrArgs)
-//   }
-//   return http.request<T>('POST', urlOrArgs, data, config)
-// }
-
-// export function put<T>(url: string, data?: unknown, config?: Partial<RequestConfig>): Promise<T>
-// export function put<T>(args: [string, unknown?, Partial<RequestConfig>?]): Promise<T>
-// export function put<T>(
-//   urlOrArgs: string | [string, unknown?, Partial<RequestConfig>?],
-//   data?: unknown,
-//   config?: Partial<RequestConfig>
-// ): Promise<T> {
-//   if (Array.isArray(urlOrArgs)) {
-//     return http.request<T>('PUT', ...urlOrArgs)
-//   }
-//   return http.request<T>('PUT', urlOrArgs, data, config)
-// }
-
-// export function del<T>(
-//   url: string,
-//   params?: Record<string, string | number>,
-//   config?: Partial<RequestConfig>
-// ): Promise<T>
-// export function del<T>(args: [string, Record<string, string | number>?, Partial<RequestConfig>?]): Promise<T>
-// export function del<T>(
-//   urlOrArgs: string | [string, Record<string, string | number>?, Partial<RequestConfig>?],
-//   params?: Record<string, string | number>,
-//   config?: Partial<RequestConfig>
-// ): Promise<T> {
-//   if (Array.isArray(urlOrArgs)) {
-//     return http.request<T>('DELETE', ...urlOrArgs)
-//   }
-//   return http.request<T>('DELETE', urlOrArgs, params, config)
-// }
 
 // 创建实例
 export const http = new HttpClient({})

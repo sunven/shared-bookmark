@@ -6,6 +6,7 @@ const urlSchema = z.object({
   title: z.string().min(1, { message: '不能为空。' }),
   url: z.string().url({ message: '请输入有效的URL。' }),
   description: z.string().optional(),
+  tags: z.array(z.string()).optional(),
 })
 
 export const formSchema = z.object({

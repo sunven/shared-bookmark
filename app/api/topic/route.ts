@@ -32,3 +32,19 @@ export async function GET(req: Request) {
   const [count, rows] = result
   return okResponse({ count, rows })
 }
+
+export async function DELETE(req: Request) {
+  const { searchParams } = new URL(req.url)
+  const ids = searchParams.get('ids')
+  if (!ids) return errorResponse('ids is required')
+
+  const { count } = await prisma.topic.deleteMany({
+    where: {
+      id: {
+        in: ids.split(','),
+      },
+    },
+  })
+
+  return okResponse({ count })
+}

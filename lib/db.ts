@@ -73,6 +73,7 @@ export function getTopic(id: string) {
           url: true,
           icon: true,
           description: true,
+          tags: true,
         },
       },
     },
