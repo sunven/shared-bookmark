@@ -1,11 +1,22 @@
 import { auth } from '@/auth'
 import { errorResponse } from './lib/utils'
 
+const whiteList = ['/login', '/register', '/', /^\/pricing/, /^\/topic/]
+
+function matchWhiteList(pathname: string) {
+  return whiteList.some(item => {
+    if (typeof item === 'string') {
+      return item === pathname
+    }
+    return item.test(pathname)
+  })
+}
+
 export default auth(req => {
   if (req.auth) {
     return
   }
-  if (['/login', '/register'].includes(req.nextUrl.pathname)) {
+  if (matchWhiteList(req.nextUrl.pathname)) {
     return
   }
   if (req.nextUrl.pathname.startsWith('/api')) {
