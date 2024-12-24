@@ -27,3 +27,13 @@ vercel env pull
 auth prisma
 
 - session 必须使用 jwt
+
+## 相较于 next-saas-stripe-starter 的不同
+
+- 移除了 `(docs)`
+- 移除了 `content`
+- 移除了 `(marketing)/(blog-post)`
+- 移除了 `(marketing)/blog`
+- 移除了 `(marketing)/[slug]`
+- 移除了 `components/content`
+- 移除了 `components/docs/pager.tsx`

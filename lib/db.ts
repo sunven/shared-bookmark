@@ -1,6 +1,8 @@
 import type { Prisma, Topic, Url } from '@prisma/client'
 import prisma from './prisma'
 
+export { default as prisma } from './prisma'
+
 // type NullToUndefined<T> = {
 //   [K in keyof T]: null extends T[K] ? undefined | Exclude<T[K], null> : T[K]
 // }

@@ -1,5 +1,5 @@
-import TopicList from './topic/list/page'
+import TopicPage from './(marketing)/topic/page'
 
 export default function Home() {
-  return <TopicList />
+  return <TopicPage />
 }
