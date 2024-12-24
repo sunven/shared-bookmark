@@ -1,16 +1,17 @@
 import { HeaderSection } from '@/components/shared/header-section'
 import { Badge } from '@/components/ui/badge'
 import { getTopic } from '@/lib/db'
+import { cn } from '@/lib/utils'
 import Image from 'next/image'
 
-export default async function TopicView(props: { params: Promise<{ id: string }> }) {
+export default async function TopicView(props: { className?: string; params: Promise<{ id: string }> }) {
   const params = await props.params
   const data = await getTopic(params.id)
 
   return (
-    <div className="">
+    <>
       <HeaderSection label="" title={data?.name || ''} subtitle={data?.description || ''} />
-      <div className="column-1 gap-5 space-y-5 md:columns-2 lg:columns-4 my-12">
+      <div className={cn(props.className, 'column-1 gap-5 space-y-5 md:columns-2 lg:columns-4 my-12')}>
         {data?.urls.map(item => (
           <div className="break-inside-avoid" key={item.id}>
             <div className="relative rounded-xl border bg-muted/25">
@@ -38,6 +39,6 @@ export default async function TopicView(props: { params: Promise<{ id: string }>
           </div>
         ))}
       </div>
-    </div>
+    </>
   )
 }

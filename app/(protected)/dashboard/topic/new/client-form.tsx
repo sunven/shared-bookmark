@@ -11,11 +11,13 @@ import { upsertTopic } from './actions'
 import { http } from '@/lib/http'
 import { useRouter } from 'next/navigation'
 import { getTopic } from '@/lib/db'
-import { JsonBodyType } from '@/lib/utils'
+import { getValidUrl, JsonBodyType } from '@/lib/utils'
 import to from 'await-to-js'
 import { Textarea } from '@/components/ui/textarea'
 import { toast } from 'sonner'
 import { TagsInput } from '@/components/tags-input'
+import { BatchAdd } from '../batch-add'
+import Image from 'next/image'
 
 export interface ClientFormProps {
   data?: Awaited<ReturnType<typeof getTopic>>
@@ -121,7 +123,7 @@ export default function ClientForm({ data }: ClientFormProps) {
                 render={({ field }) => (
                   <FormItem>
                     <div className="flex items-center space-x-4">
-                      <FormLabel className="flex-shrink-0 w-20">网址</FormLabel>
+                      <FormLabel className="flex-shrink-0 w-20">Url</FormLabel>
                       <FormControl>
                         <div className="flex flex-1 gap-2">
                           <Input className="flex-1" {...field} />
@@ -132,12 +134,14 @@ export default function ClientForm({ data }: ClientFormProps) {
                               if (!result) {
                                 return
                               }
-                              const { title, icon, description } = await http.get<{
-                                title: string
-                                icon: string
-                                description: string
-                              }>('/api/resolveUrl', {
-                                url: field.value,
+                              const [{ title, icon, description }] = await http.get<
+                                {
+                                  title: string
+                                  icon: string
+                                  description: string
+                                }[]
+                              >('/api/resolveUrl', {
+                                urls: field.value,
                               })
                               form.setValue(`urls.${index}.title`, title)
                               form.setValue(`urls.${index}.icon`, icon)
@@ -158,12 +162,12 @@ export default function ClientForm({ data }: ClientFormProps) {
                 render={({ field }) => (
                   <FormItem>
                     <div className="flex items-center space-x-4">
-                      <FormLabel className="flex-shrink-0 w-20">tag</FormLabel>
+                      <FormLabel className="flex-shrink-0 w-20">Tag</FormLabel>
                       <FormControl>
                         <TagsInput
                           // {...field}
                           className="w-full"
-                          value={field.value}
+                          value={field.value || []}
                           onValueChange={v => {
                             field.onChange(v)
                           }}
@@ -179,7 +183,7 @@ export default function ClientForm({ data }: ClientFormProps) {
                 render={({ field }) => (
                   <FormItem>
                     <div className="flex items-center space-x-4">
-                      <FormLabel className="flex-shrink-0 w-20">网址标题</FormLabel>
+                      <FormLabel className="flex-shrink-0 w-20">Title</FormLabel>
                       <FormControl>
                         <Input {...field} />
                       </FormControl>
@@ -193,9 +197,20 @@ export default function ClientForm({ data }: ClientFormProps) {
                 render={({ field }) => (
                   <FormItem>
                     <div className="flex items-center space-x-4">
-                      <FormLabel className="flex-shrink-0 w-20">图标URL</FormLabel>
+                      <FormLabel className="flex-shrink-0 w-20">Icon</FormLabel>
                       <FormControl>
-                        <Input {...field} />
+                        <div className="w-full flex gap-2">
+                          <Image
+                            width={36}
+                            height={36}
+                            src={getValidUrl(field.value, 'https://authjs.dev/favicon-32x32.png')}
+                            alt={field.value}
+                            onError={e => {
+                              e.currentTarget.src = 'https://authjs.dev/favicon-32x32.png' // 设置备用图片
+                            }}
+                          />
+                          <Input {...field} />
+                        </div>
                       </FormControl>
                     </div>
                     <FormMessage />
@@ -219,12 +234,24 @@ export default function ClientForm({ data }: ClientFormProps) {
             </div>
           ))}
         </div>
-        <div className="flex justify-between pb-4">
+        <div className="flex gap-2 pb-4">
           <Button type="button" variant="outline" onClick={() => append({ ...defaultUrl })}>
             <PlusCircle className="h-4 w-4 mr-2" />
             添加网址
           </Button>
-          <Button type="submit">提交</Button>
+          <BatchAdd
+            onResolved={data => {
+              data.forEach(item => append(item))
+            }}
+          >
+            <Button type="button" variant="outline">
+              <PlusCircle className="h-4 w-4 mr-2" />
+              批量添加网址
+            </Button>
+          </BatchAdd>
+          <Button type="submit" className="ml-auto">
+            提交
+          </Button>
         </div>
       </form>
     </Form>

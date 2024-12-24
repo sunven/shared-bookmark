@@ -31,6 +31,7 @@ import Link from 'next/link'
 import { DeleteDialog } from '@/components/delete-dialog'
 import { toast } from 'sonner'
 import { isEmpty } from 'lodash-es'
+import { DashboardHeader } from '@/components/dashboard/header'
 
 type Topic = {
   id: string
@@ -177,6 +178,7 @@ export default function DataTableDemo() {
 
   return (
     <div className="w-full">
+      <DashboardHeader heading="Topics" text="topics" />
       <div className="flex gap-2 items-center py-4">
         <Input
           placeholder="Filter emails..."

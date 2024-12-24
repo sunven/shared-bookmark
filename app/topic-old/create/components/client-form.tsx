@@ -122,12 +122,14 @@ export default function ClientForm({ data }: ClientFormProps) {
                               if (!result) {
                                 return
                               }
-                              const { title, icon, description } = await http.get<{
-                                title: string
-                                icon: string
-                                description: string
-                              }>('/api/resolveUrl', {
-                                url: field.value,
+                              const [{ title, icon, description }] = await http.get<
+                                {
+                                  title: string
+                                  icon: string
+                                  description: string
+                                }[]
+                              >('/api/resolveUrl', {
+                                urls: field.value,
                               })
                               form.setValue(`urls.${index}.title`, title)
                               form.setValue(`urls.${index}.icon`, icon)
