@@ -1,5 +1,6 @@
 import type { Prisma, Topic, Url } from '@prisma/client'
 import prisma from './prisma'
+import { getCurrentUser } from './session'
 
 export { default as prisma } from './prisma'
 
@@ -87,12 +88,14 @@ export async function createTopic(data: {
   description?: string
   urls: Prisma.UrlCreateWithoutTopicInput[]
 }) {
+  const user = await getCurrentUser()
   return prisma.topic.create({
     data: {
       name: data.name,
       description: data.description,
+      creatorId: user?.id,
       urls: {
-        create: data.urls,
+        create: data.urls.map(c => ({ ...c, creatorId: user?.id })),
       },
     },
     select: { id: true },

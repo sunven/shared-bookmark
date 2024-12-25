@@ -1,4 +1,5 @@
 import prisma from '@/lib/prisma'
+import { getCurrentUser } from '@/lib/session'
 import { errorResponse, okResponse } from '@/lib/utils'
 import to from 'await-to-js'
 
@@ -7,7 +8,9 @@ export async function GET(req: Request) {
   const pageIndex = searchParams.get('pageIndex')
   const pageSize = searchParams.get('pageSize')
   const name = searchParams.get('name') || ''
+  const user = await getCurrentUser()
   const where = {
+    creatorId: user?.id,
     name: {
       contains: name,
     },

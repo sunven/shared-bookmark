@@ -44,7 +44,9 @@ type Topic = {
   }
 }
 
-export default function DataTableDemo() {
+export const dynamic = 'force-dynamic'
+
+export default function TopicPage() {
   const [sorting, setSorting] = useState<SortingState>([])
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([])
   const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({})
