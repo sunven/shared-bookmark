@@ -36,7 +36,7 @@ export default function RootLayout({ children }: RootLayoutProps) {
               <SWRProvider>{children}</SWRProvider>
             </ModalProvider>
             <Analytics />
-            <Toaster richColors closeButton position="top-center" />
+            <Toaster richColors position="top-center" />
             <TailwindIndicator />
           </ThemeProvider>
         </SessionProvider>
