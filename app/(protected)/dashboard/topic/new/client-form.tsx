@@ -200,14 +200,13 @@ export default function ClientForm({ data }: ClientFormProps) {
                       <FormLabel className="flex-shrink-0 w-10">Icon</FormLabel>
                       <FormControl>
                         <div className="w-full flex gap-2">
-                          <Image
-                            width={36}
-                            height={36}
-                            src={getValidUrl(field.value, 'https://authjs.dev/favicon-32x32.png')}
+                          {/* eslint-disable-next-line @next/next/no-img-element */}
+                          <img
+                            width={32}
+                            height={32}
+                            style={{ width: 32, height: 32 }}
+                            src={field.value}
                             alt={field.value}
-                            onError={e => {
-                              e.currentTarget.src = 'https://authjs.dev/favicon-32x32.png' // 设置备用图片
-                            }}
                           />
                           <Input {...field} />
                         </div>

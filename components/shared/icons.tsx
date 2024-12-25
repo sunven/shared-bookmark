@@ -2,6 +2,7 @@ import {
   AlertTriangle,
   ArrowRight,
   ArrowUpRight,
+  Bookmark,
   BookOpen,
   Check,
   ChevronLeft,
@@ -24,16 +25,15 @@ import {
   MoreVertical,
   Package,
   Plus,
-  Puzzle,
   Search,
   Settings,
   SunMedium,
   Trash,
   User,
   X,
-} from "lucide-react";
+} from 'lucide-react'
 
-export type Icon = LucideIcon;
+export type Icon = LucideIcon
 
 export const Icons = {
   add: Plus,
@@ -103,7 +103,7 @@ export const Icons = {
   home: Home,
   laptop: Laptop,
   lineChart: LineChart,
-  logo: Puzzle,
+  logo: () => <Bookmark color="#8E2DE2" />,
   media: Image,
   messages: MessagesSquare,
   moon: Moon,
@@ -134,4 +134,4 @@ export const Icons = {
   ),
   user: User,
   warning: AlertTriangle,
-};
+}

@@ -106,7 +106,7 @@ export function UserAuthForm({ className, type, ...props }: UserAuthFormProps) {
         )}{' '}
         Google
       </button>
-      <button
+      {/* <button
         type="button"
         className={cn(buttonVariants({ variant: 'outline' }))}
         onClick={() => {
@@ -121,7 +121,7 @@ export function UserAuthForm({ className, type, ...props }: UserAuthFormProps) {
           <Icons.gitHub className="mr-2 size-4" />
         )}{' '}
         GitHub
-      </button>
+      </button> */}
     </div>
   )
 }

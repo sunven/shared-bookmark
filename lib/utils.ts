@@ -99,16 +99,20 @@ function getIconHref($: cheerio.CheerioAPI) {
 }
 
 function getUrl(url: string | undefined, websiteUrl: string) {
+  const parsedUrl = new URL(websiteUrl)
   if (!url) {
+    return parsedUrl.origin + '/favicon.ico'
+  }
+  if (url.startsWith('http')) {
     return url
   }
-  const parsedUrl = new URL(websiteUrl)
+
   if (url.startsWith('//')) {
     return parsedUrl.protocol + url
   } else if (url.startsWith('/')) {
     return parsedUrl.origin + url
   } else {
-    return url
+    return parsedUrl.origin + '/' + url
   }
 }
 
