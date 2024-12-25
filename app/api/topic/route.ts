@@ -6,10 +6,17 @@ export async function GET(req: Request) {
   const { searchParams } = new URL(req.url)
   const pageIndex = searchParams.get('pageIndex')
   const pageSize = searchParams.get('pageSize')
-  const countPromise = prisma.topic.count({})
+  const name = searchParams.get('name') || ''
+  const where = {
+    name: {
+      contains: name,
+    },
+  }
+  const countPromise = prisma.topic.count({ where })
   const topicPromise = prisma.topic.findMany({
     skip: Number(pageIndex) * Number(pageSize),
     take: Number(pageSize),
+    where,
     orderBy: {
       updatedAt: 'desc',
     },

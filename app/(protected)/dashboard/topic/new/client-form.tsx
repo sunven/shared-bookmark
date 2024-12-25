@@ -101,7 +101,7 @@ export default function ClientForm({ data }: ClientFormProps) {
             </FormItem>
           )}
         />
-        <div className="grid grid-cols-2 gap-4">
+        <div className="grid grid-cols-3 gap-4">
           {fields.map((field, index) => (
             <div key={field.key} className="space-y-4 p-4 border rounded-md relative group">
               {fields.length > 1 && (
@@ -123,7 +123,7 @@ export default function ClientForm({ data }: ClientFormProps) {
                 render={({ field }) => (
                   <FormItem>
                     <div className="flex items-center space-x-4">
-                      <FormLabel className="flex-shrink-0 w-20">Url</FormLabel>
+                      <FormLabel className="flex-shrink-0 w-10">Url</FormLabel>
                       <FormControl>
                         <div className="flex flex-1 gap-2">
                           <Input className="flex-1" {...field} />
@@ -162,7 +162,7 @@ export default function ClientForm({ data }: ClientFormProps) {
                 render={({ field }) => (
                   <FormItem>
                     <div className="flex items-center space-x-4">
-                      <FormLabel className="flex-shrink-0 w-20">Tag</FormLabel>
+                      <FormLabel className="flex-shrink-0 w-10">Tag</FormLabel>
                       <FormControl>
                         <TagsInput
                           // {...field}
@@ -183,7 +183,7 @@ export default function ClientForm({ data }: ClientFormProps) {
                 render={({ field }) => (
                   <FormItem>
                     <div className="flex items-center space-x-4">
-                      <FormLabel className="flex-shrink-0 w-20">Title</FormLabel>
+                      <FormLabel className="flex-shrink-0 w-10">Title</FormLabel>
                       <FormControl>
                         <Input {...field} />
                       </FormControl>
@@ -197,7 +197,7 @@ export default function ClientForm({ data }: ClientFormProps) {
                 render={({ field }) => (
                   <FormItem>
                     <div className="flex items-center space-x-4">
-                      <FormLabel className="flex-shrink-0 w-20">Icon</FormLabel>
+                      <FormLabel className="flex-shrink-0 w-10">Icon</FormLabel>
                       <FormControl>
                         <div className="w-full flex gap-2">
                           <Image
@@ -222,7 +222,7 @@ export default function ClientForm({ data }: ClientFormProps) {
                 render={({ field }) => (
                   <FormItem>
                     <div className="flex items-center space-x-4">
-                      <FormLabel className="flex-shrink-0 w-20">描述</FormLabel>
+                      <FormLabel className="flex-shrink-0 w-10">描述</FormLabel>
                       <FormControl>
                         <Textarea {...field} rows={2} />
                       </FormControl>

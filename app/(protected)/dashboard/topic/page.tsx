@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useMemo, useState } from 'react'
+import React, { useCallback, useMemo, useRef, useState } from 'react'
 import {
   ColumnDef,
   ColumnFiltersState,
@@ -12,7 +12,7 @@ import {
   getSortedRowModel,
   useReactTable,
 } from '@tanstack/react-table'
-import { ChevronDown, Edit, Eye, Plus, Trash2 } from 'lucide-react'
+import { ChevronDown, Edit, Eye, Plus, Search, Trash2 } from 'lucide-react'
 
 import { Button } from '@/components/ui/button'
 import { Checkbox } from '@/components/ui/checkbox'
@@ -58,10 +58,17 @@ export default function DataTableDemo() {
     pageIndex: 0, //initial page index
     pageSize: 10, //default page size
   })
-  const { data, isLoading, error, mutate } = useSWR<{ count: number; rows: Topic[] }>(
-    ['/api/topic', pagination],
-    http.get
-  )
+  const inputRef = useRef<HTMLInputElement>(null)
+  const [name, setName] = useState<string>('')
+  const setNamePageIndex = useCallback(() => {
+    const value = inputRef.current?.value || ''
+    setName(value)
+    setPagination({ ...pagination, pageIndex: 0 })
+  }, [pagination])
+  const params = useMemo(() => {
+    return { ...pagination, name }
+  }, [name, pagination])
+  const { data, isLoading, error, mutate } = useSWR<{ count: number; rows: Topic[] }>(['/api/topic', params], http.get)
   const columns: ColumnDef<Topic>[] = useMemo(
     () => [
       {
@@ -181,11 +188,21 @@ export default function DataTableDemo() {
       <DashboardHeader heading="Topics" text="topics" />
       <div className="flex gap-2 items-center py-4">
         <Input
-          placeholder="Filter emails..."
-          value={(table.getColumn('name')?.getFilterValue() as string) ?? ''}
-          onChange={event => table.getColumn('name')?.setFilterValue(event.target.value)}
+          placeholder="Filter names..."
+          ref={inputRef}
+          onKeyDown={event => {
+            if (event.code === 'Enter') setNamePageIndex()
+          }}
           className="max-w-sm"
         />
+        <Button
+          variant="outline"
+          onClick={() => {
+            setNamePageIndex()
+          }}
+        >
+          <Search />
+        </Button>
         <Link href="/dashboard/topic/new">
           <Button type="button" variant="outline">
             <Plus />
