@@ -30,7 +30,7 @@ const defaultUrl = {
 }
 
 export default function ClientForm({ data }: ClientFormProps) {
-  console.log('data', data)
+  // console.log('data', data)
   const router = useRouter()
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),

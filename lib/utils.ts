@@ -64,7 +64,8 @@ export async function resolveUrl<T>(urlList: string[]) {
             break
           }
           const $ = cheerio.load(html)
-          const icon = getUrl(getIconHref($), url)
+          const baseUrl = getBaseUrl($, url)
+          const icon = getFaviconUrl($, baseUrl)
           const description = $('meta[name="description"]').attr('content') || ''
           result.push({ title: getTitle($, url), url, icon, description } as T)
         }
@@ -88,32 +89,52 @@ function getTitle($: cheerio.CheerioAPI, href: string) {
   return title.substring(0, 128)
 }
 
-function getIconHref($: cheerio.CheerioAPI) {
-  const arr = ['link[rel="icon"]', 'link[rel="shortcut icon"]']
-  for (const selector of arr) {
-    const url = $(selector).attr('href')
-    if (url) {
-      return url
-    }
-  }
+function removeTailSlash(str: string) {
+  return str.replace(/\/+$/, '')
 }
 
-function getUrl(url: string | undefined, websiteUrl: string) {
-  const parsedUrl = new URL(websiteUrl)
+function completionUrl(url: string, websiteUrl: string, isBaseUrl = false) {
   if (!url) {
-    return parsedUrl.origin + '/favicon.ico'
+    return url
   }
   if (url.startsWith('http')) {
     return url
   }
-
+  const parsedUrl = new URL(websiteUrl)
   if (url.startsWith('//')) {
     return parsedUrl.protocol + url
   } else if (url.startsWith('/')) {
-    return parsedUrl.origin + url
+    return (isBaseUrl ? removeTailSlash(websiteUrl) : parsedUrl.origin) + url
   } else {
-    return parsedUrl.origin + '/' + url
+    return (isBaseUrl ? removeTailSlash(websiteUrl) : parsedUrl.origin) + '/' + url
   }
+}
+
+function getBaseUrl($: cheerio.CheerioAPI, websiteUrl: string) {
+  const parsedUrl = new URL(websiteUrl)
+  const base = $('base')
+  if (!base) {
+    return parsedUrl.origin
+  }
+
+  const href = base.attr('href')
+  return !!href ? completionUrl(href, websiteUrl) : parsedUrl.origin
+}
+
+function getFaviconUrl($: cheerio.CheerioAPI, baseUrl: string) {
+  const arr = ['link[rel="icon"]', 'link[rel="shortcut icon"]']
+  let result = ''
+  for (const selector of arr) {
+    const url = $(selector).attr('href')
+    if (url) {
+      result = completionUrl(url, baseUrl, true)
+      break
+    }
+  }
+  if (!result) {
+    return baseUrl + '/favicon.ico'
+  }
+  return result
 }
 
 export function constructMetadata({
