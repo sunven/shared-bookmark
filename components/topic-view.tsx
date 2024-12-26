@@ -19,7 +19,7 @@ export default async function TopicView(props: { className?: string; params: Pro
                 <div>
                   <div className="relative mb-4 flex items-center gap-3">
                     <span className="relative inline-flex size-10 shrink-0 items-center justify-center rounded-full text-base">
-                      <Image width={100} height={100} className="" src={item.icon || ''} alt={item.title} />
+                      <img style={{ width: 40, height: 40 }} className="" src={item.icon || ''} alt={item.title} />
                     </span>
                     <div className="overflow-hidden truncate">
                       <a className="[all:revert]" href={item.url || ''} target="_blank">

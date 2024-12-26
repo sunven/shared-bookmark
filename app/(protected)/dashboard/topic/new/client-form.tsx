@@ -201,13 +201,7 @@ export default function ClientForm({ data }: ClientFormProps) {
                       <FormControl>
                         <div className="w-full flex gap-2">
                           {/* eslint-disable-next-line @next/next/no-img-element */}
-                          <img
-                            width={32}
-                            height={32}
-                            style={{ width: 32, height: 32 }}
-                            src={field.value}
-                            alt={field.value}
-                          />
+                          <img style={{ width: 32, height: 32 }} src={field.value} alt={field.value} />
                           <Input {...field} />
                         </div>
                       </FormControl>
