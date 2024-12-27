@@ -5,19 +5,20 @@ import { Input } from '@/components/ui/input'
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form'
 import { useFieldArray, useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { PlusCircle, RefreshCcw, Trash2 } from 'lucide-react'
+import { Loader, PlusCircle, RefreshCcw, Trash2 } from 'lucide-react'
 import { formSchema } from './schema'
 import { upsertTopic } from './actions'
 import { http } from '@/lib/http'
 import { useRouter } from 'next/navigation'
 import { getTopic } from '@/lib/db'
-import { getValidUrl, JsonBodyType } from '@/lib/utils'
+import { JsonBodyType } from '@/lib/utils'
 import to from 'await-to-js'
 import { Textarea } from '@/components/ui/textarea'
 import { toast } from 'sonner'
 import { TagsInput } from '@/components/tags-input'
 import { BatchAdd } from '../batch-add'
 import Image from 'next/image'
+import { useTransition } from 'react'
 
 export interface ClientFormProps {
   data?: Awaited<ReturnType<typeof getTopic>>
@@ -31,8 +32,10 @@ const defaultUrl = {
 
 export default function ClientForm({ data }: ClientFormProps) {
   // console.log('data', data)
+  const [isPending, startTransition] = useTransition()
   const router = useRouter()
   const form = useForm<z.infer<typeof formSchema>>({
+    disabled: isPending,
     resolver: zodResolver(formSchema),
     defaultValues: data
       ? {
@@ -56,23 +59,26 @@ export default function ClientForm({ data }: ClientFormProps) {
     name: 'urls',
   })
 
-  async function handleSubmit(values: z.infer<typeof formSchema>) {
-    const [err, result] = await to<JsonBodyType<string>>(upsertTopic(values, data))
-    if (err) {
-      toast.error(err.message)
-      return
-    }
-    const { status, message } = result
-    if (status === 0) {
-      toast.success('保存成功')
-      router.back()
-    } else {
-      toast.error(message)
-    }
+  const handleSubmit1 = (values: z.infer<typeof formSchema>) => {
+    startTransition(async () => {
+      const [err, result] = await to<JsonBodyType<string>>(upsertTopic(values, data))
+      if (err) {
+        toast.error(err.message)
+        return
+      }
+      const { status, message } = result
+      if (status === 0) {
+        toast.success('保存成功')
+        router.back()
+      } else {
+        toast.error(message)
+      }
+    })
   }
+
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-8">
+      <form onSubmit={form.handleSubmit(handleSubmit1)} className="space-y-8">
         <FormField
           name="name"
           render={({ field }) => (
@@ -242,7 +248,8 @@ export default function ClientForm({ data }: ClientFormProps) {
               批量添加网址
             </Button>
           </BatchAdd>
-          <Button type="submit" className="ml-auto">
+          <Button type="submit" className="ml-auto" disabled={isPending}>
+            {isPending && <Loader className="animate-spin" />}
             提交
           </Button>
         </div>
