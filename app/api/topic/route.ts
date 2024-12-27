@@ -34,6 +34,15 @@ export async function GET(req: Request) {
           urls: true,
         },
       },
+      urls: {
+        take: 1, // 只取第一条
+        // orderBy: {
+        //   createdAt: 'desc', // 按创建时间倒序
+        // },
+        select: {
+          icon: true,
+        },
+      },
     },
   })
 

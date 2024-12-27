@@ -42,6 +42,9 @@ type Topic = {
   _count: {
     urls: number
   }
+  urls: {
+    icon: string
+  }[]
 }
 
 export const dynamic = 'force-dynamic'
@@ -95,6 +98,14 @@ export default function TopicPage() {
       {
         accessorKey: 'name',
         header: 'Name',
+        cell: ({ row }) => {
+          return (
+            <div className="flex items-center gap-2">
+              <img src={row.original.urls[0].icon} className="size-4" />
+              {row.original.name}
+            </div>
+          )
+        },
       },
       {
         accessorKey: 'description',
